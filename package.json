@@ -1,0 +1,19 @@
+{
+  "name": "booktrust",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run dev",
+    "server": "nodemon Server/index.js",
+    "frontend": "npm run dev --prefix FrontEnd",
+    "dev": "concurrently \"npm run server\" \"npm run frontend\"",
+    "install-all": "npm install --prefix FrontEnd && npm install --prefix Server"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "concurrently": "^9.1.0"
+  }
+}

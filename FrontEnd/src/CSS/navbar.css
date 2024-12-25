@@ -1,0 +1,103 @@
+/* Navbar Styles */
+.navbar-custom {
+  background: linear-gradient(
+    45deg,
+    #ff6a00,
+    #ff8c00
+  ); /* Darker Orangish gradient */
+  padding: 1rem 2rem;
+}
+
+.navbar-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #fff;
+  margin-left: 20px;
+  padding-left: 150px;
+}
+
+.navbar-logo {
+  height: 40px; /* Adjust logo size */
+  margin-right: 10px;
+}
+
+.navbar-nav .nav-link {
+  color: #fff !important;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  width: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.navbar-nav .nav-link:hover {
+  color: #8af8b2 !important; /* Hover effect */
+}
+
+.navbar-nav .active-link {
+  color: #fff !important; /* White color for text */
+  background-color: #ff8c00 !important; /* Contrasting dark orange background */
+  font-weight: 600;
+  border-radius: 5px;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Added shadow to emphasize the active link */
+}
+
+.navbar-toggler-icon {
+  background-color: #ff8c00; /* Toggle icon color */
+}
+
+/* For mobile, make sure the navbar is full-width */
+@media (max-width: 767px) {
+  .navbar-nav {
+    text-align: center;
+  }
+}
+/* navbar.css */
+.navbar-custom {
+  background-color: #f8f9fa; /* Light background for the navbar */
+}
+
+.navbar-logo {
+  height: 40px; /* Adjust logo size */
+}
+
+.navbar-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  /* Set a color for the navbar title */
+}
+
+.nav-link.active-link {
+  color: #ffffff !important; /* Active link color */
+  font-weight: bold;
+}
+
+.nav-link {
+  color: #555; /* Default link color */
+  padding: 0.5rem 1rem;
+}
+
+.nav-link:hover {
+  color: #007bff; /* Hover effect on links */
+}
+
+@media (max-width: 768px) {
+  .navbar-title {
+    display: none; /* Hide title on mobile */
+  }
+}
+
+.navbar-custom {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1050; /* Ensures navbar is always on top */
+  padding-top: 10px; /* Optional, to give space from the top if needed */
+}
+
+body {
+  padding-top: 80px; /* Adjust this value depending on the navbar height */
+}

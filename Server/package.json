@@ -1,0 +1,36 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "A simple server project using Node.js, Express, and MongoDB",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server": "nodemon Server/index.js"
+  },
+  "author": "Your Name",
+  "license": "ISC",
+  "dependencies": {
+    "@faker-js/faker": "^9.3.0",
+    "axios": "^1.7.9",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "faker": "^5.5.3",
+    "mongodb": "^6.11.0",
+    "mongoose": "^8.8.4",
+    "nodemon": "^3.1.7"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/repository-name.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/repository-name/issues"
+  },
+  "homepage": "https://github.com/your-username/repository-name#readme",
+  "devDependencies": {
+    "@types/faker": "^6.6.11"
+  }
+}
