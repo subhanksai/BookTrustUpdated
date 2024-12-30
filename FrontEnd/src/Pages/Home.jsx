@@ -310,7 +310,7 @@ const OrderForm = () => {
           newRecord
         );
 
-        console.log("Record created/updated successfully:", postResponse.data);
+        console.log("Record created/updated successfully", postResponse.data);
         alert("Record created/updated successfully!");
 
         // Refresh the page after successful submission
