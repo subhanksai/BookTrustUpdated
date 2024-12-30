@@ -8,12 +8,17 @@
     "server": "nodemon Server/index.js",
     "frontend": "npm run dev --prefix FrontEnd",
     "dev": "concurrently \"npm run server\" \"npm run frontend\"",
-    "install-all": "npm install --prefix FrontEnd && npm install --prefix Server"
+    "install-all": "npm install --prefix FrontEnd && npm install --prefix Server",
+    "build": "vite build",
+    "deploy": "gh-pages -d dist"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "concurrently": "^9.1.0"
+  },
+  "devDependencies": {
+    "vite": "^6.0.5"
   }
 }
