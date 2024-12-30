@@ -669,8 +669,70 @@ const UpdateForm = () => {
           placeholder="Enter multiple values separated by commas"
         />
       </div>
-
       <div className="mb-3">
+        <label className="form-label">Identify Fields:</label>
+        <div>
+          <div className="form-check">
+            <input
+              type="radio"
+              id="orderProforma"
+              name="fieldSelection"
+              className="form-check-input"
+              checked={isOrderProformaChecked}
+              onChange={() => setIsOrderProformaChecked(true)}
+            />
+            <label className="form-check-label" htmlFor="orderProforma">
+              Order Proforma
+            </label>
+          </div>
+
+          <div className="form-check">
+            <input
+              type="radio"
+              id="customerId"
+              name="fieldSelection"
+              className="form-check-input"
+              checked={isCustomerIdChecked}
+              onChange={() => setIsCustomerIdChecked(true)}
+            />
+            <label className="form-check-label" htmlFor="customerId">
+              Customer ID (Where Buyer & Remitter are Same)
+            </label>
+          </div>
+
+          <div className="form-check">
+            <input
+              type="radio"
+              id="InvoiceNo"
+              name="fieldSelection"
+              className="form-check-input"
+              checked={isInvoiceChecked}
+              onChange={() => setIsInvoiceChecked(true)}
+            />
+            <label className="form-check-label" htmlFor="InvoiceNo">
+              Invoice No
+            </label>
+          </div>
+          <div className="form-check">
+            <input
+              type="radio"
+              id="PayPalInvoiceNo"
+              name="fieldSelection"
+              className="form-check-input"
+              checked={isPaypalInvoiceChecked}
+              onChange={() => setIsPaypalInvoiceChecked(true)}
+            />
+            <label className="form-check-label" htmlFor="PayPalInvoiceNo">
+              Paypal Invoice No
+            </label>
+          </div>
+        </div>
+        <button className="btn btn-primary" onClick={handleSearch}>
+          Submit
+        </button>
+      </div>
+
+      {/* <div className="mb-3">
         <label className="form-label">Identify Fields:</label>
         <div>
           <div className="form-check">
@@ -731,7 +793,7 @@ const UpdateForm = () => {
         <button className="btn btn-primary" onClick={handleSearch}>
           Submit
         </button>
-      </div>
+      </div> */}
 
       <div className="mb-3">
         <label className="form-label">Transaction Type:</label>
