@@ -4,6 +4,8 @@ import { useEffect } from "react";
 import "../CSS/main.css";
 
 const UpdateForm = () => {
+    const url =
+    "https://booktrust-backend.onrender.com";
   const [InputValues, setInputValues] = useState("");
 
   const [errors, setErrors] = useState({});
@@ -513,7 +515,7 @@ const UpdateForm = () => {
       console.log("Request Params for first call:", params);
 
       // Send API request with the constructed params
-      const response = await axios.get("http://localhost:8085/api/getOrder", {
+      const response = await axios.get(`${url}/api/getOrder`, {
         params,
       });
 
@@ -544,7 +546,7 @@ const UpdateForm = () => {
 
         // Fetch data for the given remittercustomerId
         const secondResponse = await axios.get(
-          "http://localhost:8085/api/getOrder",
+          `${url}/api/getOrder`,
           {
             params: secondParams,
           }
@@ -615,7 +617,7 @@ const UpdateForm = () => {
     if (transactionType === "new" || transactionType === "cancel") {
       // Make a POST request for new or cancel transaction
       axios
-        .post("http://localhost:8085/api/create", updatedFormData)
+        .post(`${url}/api/create`, updatedFormData)
         .then((response) => {
           console.log("Transaction submitted successfully:", response.data);
           alert("Transaction submitted successfully");
@@ -629,7 +631,7 @@ const UpdateForm = () => {
       // Make a PUT request for updating an existing transaction
       axios
         // .put("http://localhost:8085/api/updateOrder", updatedFormData)
-        .post("http://localhost:8085/api/create", updatedFormData)
+        .post(`${url}/api/create`, updatedFormData)
         .then((response) => {
           console.log("Order updated successfully:", response.data);
           alert("Order updated successfully");
