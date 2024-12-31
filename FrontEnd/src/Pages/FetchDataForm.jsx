@@ -571,7 +571,7 @@ const FetchDataForm = () => {
             filteredItem["InvoiceNo"] = item["invoiceNo"];
           }
           if (bankFields.invoiceDate) {
-            filteredItem["InvoiceDate"] = item["invoiceDate"];
+            filteredItem["InvoiceDate"] = new Date(item["invoiceDate"].toISOString().split("T")[0];
           }
           if (bankFields.invoiceAmount) {
             filteredItem["InvoiceAmount"] = item["totalOrderValue"];
@@ -592,7 +592,7 @@ const FetchDataForm = () => {
             filteredItem["AwbBillOfLadingNo"] = item["awb"];
           }
           if (bankFields.dateOfRemittance) {
-            filteredItem["DateOfRemittance"] = item["bankRemittanceDate"];
+            filteredItem["DateOfRemittance"] = new Date(item["bankRemittanceDate"]).toISOString().split("T")[0];
           }
           if (bankFields.ModeOfRemmittance) {
             filteredItem["ModeOfRemmittance"] = item["modeOfPayment"];
@@ -616,9 +616,10 @@ const FetchDataForm = () => {
           }
           if (bankFields.amountInINR) {
             if (item["modeOfPayment"] === "PAYPAL") {
-              filteredItem["AmountInINR"] = item["outOfRemittanceForOrder"];
+              filteredItem["AmountInINR"] = `₹ ${item["outOfRemittanceForOrder"].toFixed(2)}`;
             } else {
-              filteredItem["AmountInINR"] = item["bankRemittanceAmount"];
+             filteredItem["AmountInINR"] = `₹ ${item["bankRemittanceAmount"].toFixed(2)}`;
+
             }
           }
 
