@@ -76,7 +76,7 @@ const orderSchema = new mongoose.Schema(
       Email: { type: String },
     },
     osrNo: {
-      type: Number,
+      type: String,
     },
     osrDate: {
       type: Date,
