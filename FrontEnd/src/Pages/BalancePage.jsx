@@ -3,7 +3,9 @@ import { useState } from "react";
 import axios from "axios";
 import "../CSS/main.css";
 
-const BalancePage = () => {
+const BalancePage = () => {  
+  const url =
+    "https://booktrust-backend.onrender.com";
   const [formData, setFormData] = useState({
     remitterCountry: "",
     paymentReferenceNo: "",
@@ -94,7 +96,7 @@ const BalancePage = () => {
       console.log("Request Params:", params);
 
       // Send API request with the constructed params
-      const response = await axios.get("http://localhost:8085/api/getOrder", {
+      const response = await axios.get(`${url}/api/getOrder`, {
         params,
       });
 
