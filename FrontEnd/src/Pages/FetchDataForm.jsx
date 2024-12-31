@@ -571,7 +571,7 @@ const FetchDataForm = () => {
             filteredItem["InvoiceNo"] = item["invoiceNo"];
           }
           if (bankFields.invoiceDate) {
-            filteredItem["InvoiceDate"] = new Date(item["invoiceDate"].toISOString().split("T")[0];
+            filteredItem["InvoiceDate"] = new Date(item["invoiceDate"]).toISOString().split("T")[0];
           }
           if (bankFields.invoiceAmount) {
             filteredItem["InvoiceAmount"] = item["totalOrderValue"];
