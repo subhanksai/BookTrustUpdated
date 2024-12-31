@@ -5,6 +5,8 @@ import * as XLSX from "xlsx";
 import "../CSS/main.css";
 
 const FetchDataForm = () => {
+    const url =
+    "https://booktrust-backend.onrender.com";
   const [InputValues, setInputValues] = useState("");
 
   const [selectedQuery, setSelectedQuery] = useState("selectAll");
@@ -329,11 +331,11 @@ const FetchDataForm = () => {
         }, {});
         // console.log(params);
 
-        response = await axios.get("http://localhost:8085/api/fetchAllData", {
+        response = await axios.get(`${url}/api/fetchAllData`, {
           params,
         });
       } else {
-        response = await axios.get("http://localhost:8085/api/fetchAllData");
+        response = await axios.get(`${url}/api/fetchAllData`);
       }
 
       return response.data.data || [];
@@ -345,7 +347,7 @@ const FetchDataForm = () => {
 
   const fetchYearlyData = async (year) => {
     const response = await axios.get(
-      "http://localhost:8085/api/fetchYearlyData",
+      `${url}/api/fetchYearlyData`,
       {
         params: { year },
       }
@@ -372,7 +374,7 @@ const FetchDataForm = () => {
       // console.log(params);
 
       response = await axios.get(
-        "http://localhost:8085/api/fetchSpecificYearlyData",
+        `${url}/api/fetchSpecificYearlyData`,
         {
           params,
         }
@@ -390,7 +392,7 @@ const FetchDataForm = () => {
 
   const fetchMonthlyData = async (month) => {
     const response = await axios.get(
-      "http://localhost:8085/api/fetchMonthlyData",
+      `${url}/api/fetchMonthlyData`,
       {
         params: { month },
       }
@@ -415,7 +417,7 @@ const FetchDataForm = () => {
       // console.log(params);
 
       const response = await axios.get(
-        "http://localhost:8085/api/fetchSpecificMonthlyData",
+        `${url}/api/fetchSpecificMonthlyData`,
         {
           params,
         }
@@ -435,7 +437,7 @@ const FetchDataForm = () => {
     // console.log(startDate, endDate);
 
     const response = await axios.get(
-      "http://localhost:8085/api/fetchTimeFrameData",
+       `${url}/api/fetchTimeFrameData`,
       {
         params: { startDate, endDate },
       }
@@ -466,7 +468,7 @@ const FetchDataForm = () => {
       // console.log("Request params:", params);
 
       const response = await axios.get(
-        "http://localhost:8085/api/fetchSpecificTimeFrameData",
+        `${url}/api/fetchSpecificTimeFrameData`,
         {
           params,
         }
