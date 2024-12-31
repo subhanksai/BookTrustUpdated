@@ -121,39 +121,42 @@ const OrderForm = () => {
   ]);
 
   // Use the context values
-  const handleCheckboxChange = (e) => {
-    const isChecked = e.target.checked;
+ const handleCheckboxChange = (e) => {
+  const isChecked = e.target.checked;
 
-    setFormData((prevState) => {
-      if (isChecked) {
-        // If checked, copy all relevant fields from buyerDetails to remitterDetails
-        return {
-          ...prevState,
-          remitterDetails: {
-            ...prevState.buyerDetails, // Copy everything from buyerDetails to remitterDetails
-            remitterAddress: { ...prevState.buyerDetails.buyerAddress }, // Copy address as well
-          },
-          isSameAsBuyer: true,
-        };
-      } else {
-        // If unchecked, reset both personal and address fields for remitterDetails
-        return {
-          ...prevState,
-          remitterDetails: {
-            Name: "",
-            address1: "",
-            address2: "",
-            city: "",
-            state: "",
-            zip: "",
-            Phone: "",
-            Email: "",
-          },
-          isSameAsBuyer: false,
-        };
-      }
-    });
-  };
+  setFormData((prevState) => {
+    if (isChecked) {
+      // If checked, copy all relevant fields from buyerDetails to remitterDetails
+      return {
+        ...prevState,
+        remitterDetails: {
+          ...prevState.buyerDetails, // Copy everything from buyerDetails to remitterDetails
+          remitterAddress: { ...prevState.buyerDetails.buyerAddress }, // Copy address as well
+        },
+        remittercustomerId: prevState.buyercustomerId, // Set remittercustomerId to buyercustomerId
+        isSameAsBuyer: true,
+      };
+    } else {
+      // If unchecked, reset both personal and address fields for remitterDetails
+      return {
+        ...prevState,
+        remitterDetails: {
+          Name: "",
+          address1: "",
+          address2: "",
+          city: "",
+          state: "",
+          zip: "",
+          Phone: "",
+          Email: "",
+        },
+        remittercustomerId: "", // Clear remittercustomerId when unchecked
+        isSameAsBuyer: false,
+      };
+    }
+  });
+};
+
   const handleSBAddressCheckboxChange = (e) => {
     const isChecked = e.target.checked;
 
