@@ -278,7 +278,7 @@ const OrderForm = () => {
 
     try {
       // Fetch data for the given remittercustomerId
-      const response = await axios.get(`${}/api/getOrder`, { params });
+      const response = await axios.get(`${url}/api/getOrder`, { params });
 
       console.log("API Response:", response.data); // Log the response for debugging
 
@@ -306,7 +306,7 @@ const OrderForm = () => {
 
         // Create or update the record in the database
         const postResponse = await axios.post(
-          `${}/api/updateOrder`,
+          `${url}/api/updateOrder`,
           newRecord
         );
 
