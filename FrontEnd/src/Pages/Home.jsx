@@ -159,48 +159,45 @@ const OrderForm = () => {
     const remaining = currentBalance - edpmsAmount - totalOrderValue;
 
     console.log("Remaining Balance:", remaining);
+
     return remaining.toFixed(2);
   }
 
+  // Hook to handle changes in form inputs dynamically
   const handleCalChange = (e) => {
     const { name, value } = e.target;
 
-    // Parse the input value as a valid number (fallback to 0 if NaN)
-    const updatedValue = parseFloat(value) || 0;
-
     setFormData((prevData) => {
+      const updatedValue = parseFloat(value) || 0;
       const updatedData = {
         ...prevData,
-        [name]: updatedValue, // Dynamically update the field based on input name
+        [name]: updatedValue, // Dynamically update the field
       };
 
-      // Initialize updatedBalance variable
-      let updatedBalance = prevBalance; // Start with previous balance as default
+      console.log("Updated Form Data:", updatedData);
 
-      // Calculate balance based on mode of payment (PAYPAL or Bank Remittance)
-      if (updatedData.modeOfPayment === "PAYPAL") {
-        updatedBalance = parseFloat(updatedData.outOfRemittanceForOrder) || 0;
-      } else {
-        updatedBalance = parseFloat(updatedData.bankRemittanceAmount) || 0;
-      }
+      // Start with the current balance (updated dynamically)
+      let updatedBalance = prevBalance || 0;
 
-      // Now calculate the remaining balance using edpms and totalOrderValue dynamically (not requiring both)
+      // Calculate the remaining balance using updated values
+      const edpmsAmount = parseFloat(updatedData.edpms) || 0;
+      const totalOrderValue = parseFloat(updatedData.totalOrderValue) || 0;
+
+      // Calculate the remaining balance
       updatedBalance = calculateRemainingBalanceForNew(
-        updatedData.edpms,
-        updatedData.totalOrderValue,
-        updatedBalance // Use updatedBalance as the starting point for the calculation
+        edpmsAmount,
+        totalOrderValue,
+        updatedBalance // Use dynamically adjusted balance
       );
 
-      // Update balanceAmount in the formData
-      updatedData.balanceAmount = updatedBalance;
-
-      // Update balance state
-      setPrevBalance(updatedBalance); // Update previous balance state
-      setCurBalance(updatedBalance); // Update current balance state
-
-      return updatedData; // Return the updated form data
+      // Update the form state with recalculated balance
+      updatedData.balanceAmount = parseFloat(updatedBalance);
+      setCurBalance(parseFloat(updatedBalance));
+      return updatedData;
     });
   };
+  // console.log("CUR", curBalance);
+  // console.log("Prev", prevBalance);
 
   // Use the context values
   const handleCheckboxChange = (e) => {
@@ -267,76 +264,10 @@ const OrderForm = () => {
     });
   };
 
-  // const handleChange = (e) => {
-  //   const { id, value } = e.target;
-  //   const idParts = id.split(".");
-
-  //   if (idParts.length > 1) {
-  //     // Update nested object (like buyerDetails.buyerAddress.address1)
-  //     setFormData((prevState) => {
-  //       let updatedState = { ...prevState };
-  //       let nestedObject = updatedState;
-
-  //       // Traverse through the object based on the parts of the ID
-  //       idParts.forEach((part, index) => {
-  //         if (index === idParts.length - 1) {
-  //           nestedObject[part] = value; // Assign the value to the last part
-  //         } else {
-  //           // Traverse deeper into the nested object
-  //           nestedObject = nestedObject[part];
-  //         }
-  //       });
-
-  //       return updatedState;
-  //     });
-  //   } else {
-  //     // Update flat object (like buyerDetails.Name or modeOfPayment)
-  //     setFormData((prevState) => ({
-  //       ...prevState,
-  //       [id]: value, // Directly assign the value to the object key
-  //     }));
-  //   }
-  // };
-  // const handleChange = (e) => {
-  //   const { id, value } = e.target;
-  //   const idParts = id.split(".");
-
-  //   // Update formData based on nested or flat object
-  //   setFormData((prevState) => {
-  //     let updatedState = { ...prevState };
-  //     let nestedObject = updatedState;
-
-  //     // Traverse through the object based on the parts of the ID
-  //     idParts.forEach((part, index) => {
-  //       if (index === idParts.length - 1) {
-  //         nestedObject[part] = value; // Assign the value to the last part
-  //       } else {
-  //         // Traverse deeper into the nested object
-  //         nestedObject = nestedObject[part];
-  //       }
-  //     });
-
-  //     // After updating formData, calculate the updated balance
-  //     let updatedBalance = 0;
-
-  //     // Check if modeOfPayment is PAYPAL or other, and set updated balance accordingly
-  //     if (updatedState.modeOfPayment === "PAYPAL") {
-  //       updatedBalance = parseFloat(updatedState.outOfRemittanceForOrder) || 0;
-  //     } else {
-  //       updatedBalance = parseFloat(updatedState.bankRemittanceAmount) || 0;
-  //     }
-
-  //     // Update balance state
-  //     setPrevBalance(updatedBalance);
-  //     setCurBalance(updatedBalance);
-
-  //     return updatedState;
-  //   });
-  // };
   const handleChange = (e) => {
     const { id, value } = e.target;
     const idParts = id.split(".");
-
+    setPrevBalance(curBalance); //Newly added
     // Update formData based on nested or flat object
     setFormData((prevState) => {
       let updatedState = { ...prevState };
@@ -366,10 +297,6 @@ const OrderForm = () => {
       return updatedState;
     });
   };
-  console.log(formData.outOfRemittanceForOrder);
-
-  console.log(curBalance);
-  console.log(prevBalance);
 
   const handleChangeSelection = (e) => {
     const { name, value } = e.target;
@@ -405,95 +332,75 @@ const OrderForm = () => {
       yesNoOption: event.target.value,
     }));
   };
-  const handleSubmit = async (e) => {
-    e.preventDefault();
 
+  const handleBalanceCheck = (e) => {
+    const { id, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [id]: value,
+    }));
+  };
+
+  const handleSearch = async (e) => {
+    e.preventDefault();
     const params = {};
 
-    // Ensure remittercustomerId exists and is a string
     if (
       formData.remittercustomerId &&
       typeof formData.remittercustomerId === "string"
     ) {
-      // Add remittercustomerId to params with key 'i2'
       params["i2"] = formData.remittercustomerId
         .split(",")
         .map((value) => value.trim())
         .join(",");
     }
 
-    const getISTTime = () => {
-      const utcDate = new Date(); // Get the current time in UTC
-
-      // Convert UTC to IST by adding the offset (5 hours 30 minutes)
-      const istOffset = 5.5 * 60 * 60000; // 5 hours 30 minutes in milliseconds
-      const istTime = new Date(utcDate.getTime() + istOffset);
-
-      return istTime;
-    };
-
     try {
-      // Fetch data for the given remittercustomerId
       const response = await axios.get(`${url}/api/getOrder`, { params });
+      console.log("API Response:", response.data);
 
-      console.log("API Response:", response.data); // Log the response for debugging
-
-      let existingOrder = response.data.orders?.[0]; // Check if the orders array exists and contains an order
-
+      const existingOrder = response.data.orders?.[0];
       if (existingOrder) {
-        console.log("Existing Order:", existingOrder);
-        delete existingOrder._id;
-        let updatedBalance = parseFloat(existingOrder.balanceAmount) || 0; // Get the existing balance
+        let updatedBalance = parseFloat(existingOrder.balanceAmount) || 0;
 
-        // Update balance based on the payment method
         if (formData.modeOfPayment === "PAYPAL") {
           updatedBalance += parseFloat(formData.outOfRemittanceForOrder) || 0;
         } else {
           updatedBalance += parseFloat(formData.bankRemittanceAmount) || 0;
         }
 
-        // Prepare the new record with the updated balance
-        const newRecord = {
-          ...formData,
-          balanceAmount: updatedBalance.toFixed(2),
-          OrderCreatedAt: existingOrder.OrderCreatedAt,
-          OrderUpdatedAt: getISTTime(),
-        };
-
-        // Create or update the record in the database
-        const postResponse = await axios.post(
-          `${url}/api/updateOrder`,
-          newRecord
-        );
-
-        console.log("Record created/updated successfully", postResponse.data);
-        alert("Record created/updated successfully!");
-
-        // Refresh the page after successful submission
-        window.location.reload();
-      } else {
-        // Prepare the new record for creating a new entry
-        const newRecord = {
-          ...formData,
-
-          OrderCreatedAt: getISTTime(),
-          OrderUpdatedAt: getISTTime(),
-        };
-
-        console.log("New Record (Creating new order):", newRecord);
-
-        // Create the new record in the database
-        const postResponse = await axios.post(
-          `${url}/api/create` || "http://localhost:8085",
-          newRecord
-        );
-
-        console.log("Record created successfully:", postResponse.data);
-        alert("Record created successfully!");
-
-        // Refresh the page after successful submission
-        window.location.reload();
+        setPrevBalance(updatedBalance);
+        setCurBalance(updatedBalance);
       }
+    } catch (error) {
+      console.error("Error during API call:", error);
+      alert("An error occurred. Please try again.");
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const getISTTime = () => {
+      const istOffset = 5.5 * 60 * 60000; // 5 hours 30 minutes in milliseconds
+      return new Date(Date.now() + istOffset).toISOString();
+    };
+
+    try {
+      const newRecord = {
+        ...formData,
+        OrderCreatedAt: getISTTime(),
+        OrderUpdatedAt: getISTTime(),
+      };
+
+      console.log("New Record (Creating new order):", newRecord);
+
+      const postResponse = await axios.post(`${url}/api/create`, newRecord);
+      console.log("Record created successfully:", postResponse.data);
+      alert("Record created successfully!");
+      window.location.reload();
+
+      // Reset form data and state instead of refreshing
     } catch (error) {
       console.error("Error during API call:", error);
       alert("An error occurred. Please try again.");
@@ -1019,17 +926,33 @@ const OrderForm = () => {
         {/* Remitter Details*/}
         <div>
           <h4 className="mb-3 mt-3">Remitter Details</h4>
-          <div className="col-md-2 ">
-            <label htmlFor="remittercustomerId" className="form-label">
-              Remitter Customer ID
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              id="remittercustomerId"
-              value={formData.remittercustomerId}
-              onChange={handleChange}
-            />
+          <div>
+            <div className="col-md-2">
+              <label htmlFor="remittercustomerId" className="form-label">
+                Remitter Customer ID
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="remittercustomerId"
+                value={formData.remittercustomerId}
+                onChange={handleBalanceCheck}
+              />
+            </div>
+            <div
+              className="btn btn-primary mt-3"
+              onClick={handleSearch} // Trigger the function on div click
+              style={{
+                cursor: "pointer",
+                display: "inline-block",
+                padding: "10px 20px",
+                backgroundColor: "#007bff",
+                color: "#fff",
+                borderRadius: "5px",
+              }}
+            >
+              Search
+            </div>
           </div>
 
           {/* Remitter Address Section */}
