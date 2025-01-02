@@ -7,8 +7,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 const OrderForm = () => {
   const [errors, setErrors] = useState({});
-  const url =
-    "https://booktrust-backend.onrender.com";
+  const url = "http://localhost:8085";
 
   // const { formData, setFormData } = useFormData();
   const [formData, setFormData] = useState({
@@ -55,11 +54,10 @@ const OrderForm = () => {
     osrDate: "",
     invoiceNo: "",
     invoiceDate: "",
-    edpms: 0,
+    edpms: "",
     totalOrderValue: "",
-    balanceAmount: 0,
+    balanceAmount: "",
     awb: "",
-    sb: "",
     sbd: "",
 
     sbAddress: {
@@ -84,79 +82,160 @@ const OrderForm = () => {
     OrderCreatedAt: "",
     OrderUpdatedAt: "",
   });
-  useEffect(() => {
-    // Calculate and update outOfRemittanceForOrder if paidByPaypal and exchangeRate are available
-    if (formData.paidByPaypal && formData.exchangeRate) {
-      const updatedOutOfRemittance =
-        formData.paidByPaypal * formData.exchangeRate;
-      setFormData((prevData) => ({
-        ...prevData,
-        outOfRemittanceForOrder: updatedOutOfRemittance, // Store as a number
-      }));
+  // Initialize state outside the event handler
+  const [prevBalance, setPrevBalance] = useState(0); // Initialize with 0
+  const [curBalance, setCurBalance] = useState(0); // Assuming you need curBalance as well
+
+  function calculateOutOfRemittance(paidByPaypal, exchangeRate) {
+    if (paidByPaypal && exchangeRate) {
+      const updatedOutOfRemittance = paidByPaypal * exchangeRate;
+      return updatedOutOfRemittance;
     }
-  }, [formData.paidByPaypal, formData.exchangeRate]);
+    return 0; // Return 0 if no valid inputs
+  }
 
-  useEffect(() => {
-    // Only calculate balanceAmount when outOfRemittanceForOrder, totalOrderValue, and edpms are available
-    if (
-      formData.outOfRemittanceForOrder &&
-      formData.totalOrderValue &&
-      formData.edpms
-    ) {
-      const outOfRemittance = parseFloat(formData.outOfRemittanceForOrder);
-      const totalOrderValue = parseFloat(formData.totalOrderValue);
-      const edpms = parseFloat(formData.edpms);
+  // useEffect(() => {
+  //   // Only calculate balanceAmount when outOfRemittanceForOrder, totalOrderValue, and edpms are available
+  //   if (
+  //     formData.outOfRemittanceForOrder &&
+  //     formData.totalOrderValue &&
+  //     formData.edpms
+  //   ) {
+  //     const outOfRemittance = parseFloat(formData.outOfRemittanceForOrder);
+  //     const totalOrderValue = parseFloat(formData.totalOrderValue);
+  //     const edpms = parseFloat(formData.edpms);
 
-      const updatedBalanceAmount = outOfRemittance - (totalOrderValue + edpms);
+  //     const updatedBalanceAmount = outOfRemittance - (totalOrderValue + edpms);
 
-      setFormData((prevData) => ({
+  //     setFormData((prevData) => ({
+  //       ...prevData,
+  //       balanceAmount: updatedBalanceAmount, // Store as a number
+  //     }));
+  //   }
+  // }, [
+  //   formData.outOfRemittanceForOrder,
+  //   formData.totalOrderValue,
+  //   formData.edpms,
+  // ]);
+  // useEffect(() => {
+  //   const {
+  //     balanceAmount,
+  //     outOfRemittanceForOrder,
+  //     bankRemittanceAmount,
+  //     modeOfPayment,
+  //   } = formData;
+
+  //   // If balanceAmount exists, retain it and don't update it
+  //   if (balanceAmount !== undefined && balanceAmount !== null) {
+  //     setPrevBalance(balanceAmount);
+  //     setCurBalance(balanceAmount); // Retain formData.balanceAmount
+  //   } else {
+  //     // If balanceAmount doesn't exist, calculate the balance based on payment method
+  //     let updatedBalance = 0;
+
+  //     if (modeOfPayment === "PAYPAL") {
+  //       updatedBalance = parseFloat(outOfRemittanceForOrder) || 0; // Use outOfRemittanceForOrder if PAYPAL
+  //     } else {
+  //       updatedBalance = parseFloat(bankRemittanceAmount) || 0; // Use bankRemittanceAmount otherwise
+  //     }
+
+  //     setPrevBalance(updatedBalance);
+  //     setCurBalance(updatedBalance); // Update both prevBalance and curBalance
+  //   }
+  // }, [
+  //   formData.balanceAmount,
+  //   formData.outOfRemittanceForOrder,
+  //   formData.bankRemittanceAmount,
+  //   formData.modeOfPayment,
+  // ]);
+  function calculateRemainingBalanceForNew(val1, val2, total) {
+    console.log("Inputs:", val1, val2, total);
+
+    // Parse values as numbers (fallback to 0 if NaN)
+    const edpmsAmount = parseFloat(val1) || 0;
+    const totalOrderValue = parseFloat(val2) || 0;
+    const currentBalance = parseFloat(total) || 0;
+
+    const remaining = currentBalance - edpmsAmount - totalOrderValue;
+
+    console.log("Remaining Balance:", remaining);
+    return remaining.toFixed(2);
+  }
+
+  const handleCalChange = (e) => {
+    const { name, value } = e.target;
+
+    // Parse the input value as a valid number (fallback to 0 if NaN)
+    const updatedValue = parseFloat(value) || 0;
+
+    setFormData((prevData) => {
+      const updatedData = {
         ...prevData,
-        balanceAmount: updatedBalanceAmount, // Store as a number
-      }));
-    }
-  }, [
-    formData.outOfRemittanceForOrder,
-    formData.totalOrderValue,
-    formData.edpms,
-  ]);
+        [name]: updatedValue, // Dynamically update the field based on input name
+      };
+
+      // Initialize updatedBalance variable
+      let updatedBalance = prevBalance; // Start with previous balance as default
+
+      // Calculate balance based on mode of payment (PAYPAL or Bank Remittance)
+      if (updatedData.modeOfPayment === "PAYPAL") {
+        updatedBalance = parseFloat(updatedData.outOfRemittanceForOrder) || 0;
+      } else {
+        updatedBalance = parseFloat(updatedData.bankRemittanceAmount) || 0;
+      }
+
+      // Now calculate the remaining balance using edpms and totalOrderValue dynamically (not requiring both)
+      updatedBalance = calculateRemainingBalanceForNew(
+        updatedData.edpms,
+        updatedData.totalOrderValue,
+        updatedBalance // Use updatedBalance as the starting point for the calculation
+      );
+
+      // Update balanceAmount in the formData
+      updatedData.balanceAmount = updatedBalance;
+
+      // Update balance state
+      setPrevBalance(updatedBalance); // Update previous balance state
+      setCurBalance(updatedBalance); // Update current balance state
+
+      return updatedData; // Return the updated form data
+    });
+  };
 
   // Use the context values
- const handleCheckboxChange = (e) => {
-  const isChecked = e.target.checked;
+  const handleCheckboxChange = (e) => {
+    const isChecked = e.target.checked;
 
-  setFormData((prevState) => {
-    if (isChecked) {
-      // If checked, copy all relevant fields from buyerDetails to remitterDetails
-      return {
-        ...prevState,
-        remitterDetails: {
-          ...prevState.buyerDetails, // Copy everything from buyerDetails to remitterDetails
-          remitterAddress: { ...prevState.buyerDetails.buyerAddress }, // Copy address as well
-        },
-        remittercustomerId: prevState.buyercustomerId, // Set remittercustomerId to buyercustomerId
-        isSameAsBuyer: true,
-      };
-    } else {
-      // If unchecked, reset both personal and address fields for remitterDetails
-      return {
-        ...prevState,
-        remitterDetails: {
-          Name: "",
-          address1: "",
-          address2: "",
-          city: "",
-          state: "",
-          zip: "",
-          Phone: "",
-          Email: "",
-        },
-        remittercustomerId: "", // Clear remittercustomerId when unchecked
-        isSameAsBuyer: false,
-      };
-    }
-  });
-};
-
+    setFormData((prevState) => {
+      if (isChecked) {
+        // If checked, copy all relevant fields from buyerDetails to remitterDetails
+        return {
+          ...prevState,
+          remitterDetails: {
+            ...prevState.buyerDetails, // Copy everything from buyerDetails to remitterDetails
+            remitterAddress: { ...prevState.buyerDetails.buyerAddress }, // Copy address as well
+          },
+          isSameAsBuyer: true,
+        };
+      } else {
+        // If unchecked, reset both personal and address fields for remitterDetails
+        return {
+          ...prevState,
+          remitterDetails: {
+            Name: "",
+            address1: "",
+            address2: "",
+            city: "",
+            state: "",
+            zip: "",
+            Phone: "",
+            Email: "",
+          },
+          isSameAsBuyer: false,
+        };
+      }
+    });
+  };
   const handleSBAddressCheckboxChange = (e) => {
     const isChecked = e.target.checked;
 
@@ -188,36 +267,110 @@ const OrderForm = () => {
     });
   };
 
+  // const handleChange = (e) => {
+  //   const { id, value } = e.target;
+  //   const idParts = id.split(".");
+
+  //   if (idParts.length > 1) {
+  //     // Update nested object (like buyerDetails.buyerAddress.address1)
+  //     setFormData((prevState) => {
+  //       let updatedState = { ...prevState };
+  //       let nestedObject = updatedState;
+
+  //       // Traverse through the object based on the parts of the ID
+  //       idParts.forEach((part, index) => {
+  //         if (index === idParts.length - 1) {
+  //           nestedObject[part] = value; // Assign the value to the last part
+  //         } else {
+  //           // Traverse deeper into the nested object
+  //           nestedObject = nestedObject[part];
+  //         }
+  //       });
+
+  //       return updatedState;
+  //     });
+  //   } else {
+  //     // Update flat object (like buyerDetails.Name or modeOfPayment)
+  //     setFormData((prevState) => ({
+  //       ...prevState,
+  //       [id]: value, // Directly assign the value to the object key
+  //     }));
+  //   }
+  // };
+  // const handleChange = (e) => {
+  //   const { id, value } = e.target;
+  //   const idParts = id.split(".");
+
+  //   // Update formData based on nested or flat object
+  //   setFormData((prevState) => {
+  //     let updatedState = { ...prevState };
+  //     let nestedObject = updatedState;
+
+  //     // Traverse through the object based on the parts of the ID
+  //     idParts.forEach((part, index) => {
+  //       if (index === idParts.length - 1) {
+  //         nestedObject[part] = value; // Assign the value to the last part
+  //       } else {
+  //         // Traverse deeper into the nested object
+  //         nestedObject = nestedObject[part];
+  //       }
+  //     });
+
+  //     // After updating formData, calculate the updated balance
+  //     let updatedBalance = 0;
+
+  //     // Check if modeOfPayment is PAYPAL or other, and set updated balance accordingly
+  //     if (updatedState.modeOfPayment === "PAYPAL") {
+  //       updatedBalance = parseFloat(updatedState.outOfRemittanceForOrder) || 0;
+  //     } else {
+  //       updatedBalance = parseFloat(updatedState.bankRemittanceAmount) || 0;
+  //     }
+
+  //     // Update balance state
+  //     setPrevBalance(updatedBalance);
+  //     setCurBalance(updatedBalance);
+
+  //     return updatedState;
+  //   });
+  // };
   const handleChange = (e) => {
     const { id, value } = e.target;
     const idParts = id.split(".");
 
-    if (idParts.length > 1) {
-      // Update nested object (like buyerDetails.buyerAddress.address1)
-      setFormData((prevState) => {
-        let updatedState = { ...prevState };
-        let nestedObject = updatedState;
+    // Update formData based on nested or flat object
+    setFormData((prevState) => {
+      let updatedState = { ...prevState };
+      let nestedObject = updatedState;
 
-        // Traverse through the object based on the parts of the ID
-        idParts.forEach((part, index) => {
-          if (index === idParts.length - 1) {
-            nestedObject[part] = value; // Assign the value to the last part
-          } else {
-            // Traverse deeper into the nested object
-            nestedObject = nestedObject[part];
-          }
-        });
-
-        return updatedState;
+      // Traverse through the object based on the parts of the ID
+      idParts.forEach((part, index) => {
+        if (index === idParts.length - 1) {
+          nestedObject[part] = value; // Assign the value to the last part
+        } else {
+          // Traverse deeper into the nested object
+          nestedObject = nestedObject[part];
+        }
       });
-    } else {
-      // Update flat object (like buyerDetails.Name or modeOfPayment)
-      setFormData((prevState) => ({
-        ...prevState,
-        [id]: value, // Directly assign the value to the object key
-      }));
-    }
+
+      // Now check if the relevant fields are updated and calculate outOfRemittanceForOrder
+      const updatedOutOfRemittance = calculateOutOfRemittance(
+        updatedState.paidByPaypal,
+        updatedState.exchangeRate
+      );
+
+      // Set the updated outOfRemittanceForOrder in formData
+      updatedState.outOfRemittanceForOrder = updatedOutOfRemittance;
+
+      // Calculate the updated balance based on the mode of payment
+
+      return updatedState;
+    });
   };
+  console.log(formData.outOfRemittanceForOrder);
+
+  console.log(curBalance);
+  console.log(prevBalance);
+
   const handleChangeSelection = (e) => {
     const { name, value } = e.target;
 
@@ -319,18 +472,10 @@ const OrderForm = () => {
         // Refresh the page after successful submission
         window.location.reload();
       } else {
-        let updatedBalance = 0;
-        // Set balance based on the payment method
-        if (formData.modeOfPayment === "PAYPAL") {
-          updatedBalance = parseFloat(formData.outOfRemittanceForOrder) || 0;
-        } else {
-          updatedBalance = parseFloat(formData.bankRemittanceAmount) || 0;
-        }
-
         // Prepare the new record for creating a new entry
         const newRecord = {
           ...formData,
-          balanceAmount: updatedBalance.toFixed(2),
+
           OrderCreatedAt: getISTTime(),
           OrderUpdatedAt: getISTTime(),
         };
@@ -338,7 +483,10 @@ const OrderForm = () => {
         console.log("New Record (Creating new order):", newRecord);
 
         // Create the new record in the database
-        const postResponse = await axios.post(`${url}/api/create`, newRecord);
+        const postResponse = await axios.post(
+          `${url}/api/create` || "http://localhost:8085",
+          newRecord
+        );
 
         console.log("Record created successfully:", postResponse.data);
         alert("Record created successfully!");
@@ -690,7 +838,7 @@ const OrderForm = () => {
                 }}
               >
                 {/* Display the dynamically updated value of outOfRemittanceForOrder */}
-                {formData.outOfRemittanceForOrder || "N/A"}
+                {formData.outOfRemittanceForOrder}
               </div>
             </div>
             <div className="col-md-4">
@@ -1055,46 +1203,53 @@ const OrderForm = () => {
           />
         </div>
         <div></div>
-        <div className="col-md-4">
-          <label htmlFor="totalOrderValue" className="form-label">
-            Total Order Value
-          </label>
-          <input
-            type="text"
-            className="form-control"
-            id="totalOrderValue"
-            value={formData.totalOrderValue}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="col-md-4">
-          <label htmlFor="edpms" className="form-label">
-            EDPMS/ Bank Charges/ Other Expenses
-          </label>
-          <input
-            type="text"
-            className="form-control"
-            id="edpms"
-            value={formData.edpms}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="col-md-4">
-          <label htmlFor="balanceAmount" className="form-label">
-            Balance Amount
-          </label>
-          <div
-            id="balanceAmount"
-            className="form-control bg-light"
-            style={{
-              border: "1px solid #ced4da",
-              padding: "0.375rem 0.75rem",
-            }}
-          >
-            {/* Display the dynamically updated value of balanceAmount */}
-            {formData.balanceAmount || "N/A"}
+        <div className="row">
+          <div className="col-md-4 col-sm-6 col-12">
+            <label htmlFor="edpms" className="form-label">
+              EDPMS/ Bank Charges/ Other Expenses
+            </label>
+            <input
+              type="text"
+              className="form-control"
+              id="edpms"
+              name="edpms"
+              value={formData.edpms}
+              onChange={handleCalChange}
+              placeholder="Enter EDPMS or Expenses"
+            />
+          </div>
+
+          <div className="col-md-4 col-sm-6 col-12">
+            <label htmlFor="totalOrderValue" className="form-label">
+              Total Order Value
+            </label>
+            <input
+              type="text"
+              name="totalOrderValue"
+              className="form-control"
+              id="totalOrderValue"
+              value={formData.totalOrderValue}
+              onChange={handleCalChange}
+              placeholder="Enter Total Order Value"
+            />
+          </div>
+          <div>
+            {/* Your component's UI */}
+            <div className="col-md-4 custom-label text-with-border">
+              <h4
+                htmlFor="balanceAmount"
+                className={`fontkind ${
+                  curBalance > 0 ? "text-success" : "text-danger"
+                }`}
+              >
+                Balance Amount:&nbsp; &nbsp;
+                {curBalance !== undefined ? curBalance : "N/A"}
+              </h4>
+            </div>
+            {/* More UI elements */}
           </div>
         </div>
+
         <div className="col-md-2">
           <label htmlFor="awb" className="form-label">
             AWB
