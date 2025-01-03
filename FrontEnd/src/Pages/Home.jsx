@@ -7,9 +7,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 const OrderForm = () => {
   const [errors, setErrors] = useState({});
-  // const url = "http://localhost:8085";
-  const url =
-    "https://booktrust-backend.onrender.com";
+  const url = "http://localhost:8085";
+  // const url = "https://booktrust-backend.onrender.com";
 
   // const { formData, setFormData } = useFormData();
   const [formData, setFormData] = useState({
@@ -342,7 +341,7 @@ const OrderForm = () => {
       [id]: value,
     }));
   };
-
+  const [customerFound, setCustomerFound] = useState(null);
   const handleSearch = async (e) => {
     e.preventDefault();
     const params = {};
@@ -363,6 +362,7 @@ const OrderForm = () => {
 
       const existingOrder = response.data.orders?.[0];
       if (existingOrder) {
+        setCustomerFound(true);
         let updatedBalance = parseFloat(existingOrder.balanceAmount) || 0;
 
         if (formData.modeOfPayment === "PAYPAL") {
@@ -373,6 +373,8 @@ const OrderForm = () => {
 
         setPrevBalance(updatedBalance);
         setCurBalance(updatedBalance);
+      } else {
+        setCustomerFound(false);
       }
     } catch (error) {
       console.error("Error during API call:", error);
@@ -955,6 +957,13 @@ const OrderForm = () => {
             >
               Search
             </div>
+            {/* Display customer status below button */}
+            {customerFound === true && (
+              <p style={{ color: "green" }}>Customer ID found!</p>
+            )}
+            {customerFound === false && (
+              <p style={{ color: "red" }}>Customer ID not found.</p>
+            )}
           </div>
 
           {/* Remitter Address Section */}
@@ -1158,21 +1167,35 @@ const OrderForm = () => {
               placeholder="Enter Total Order Value"
             />
           </div>
-          <div>
-            {/* Your component's UI */}
-            <div className="col-md-4 custom-label text-with-border">
-              <h4
-                htmlFor="balanceAmount"
-                className={`fontkind ${
-                  curBalance > 0 ? "text-success" : "text-danger"
-                }`}
-              >
-                Balance Amount:&nbsp; &nbsp;
-                {curBalance !== undefined ? curBalance : "N/A"}
-              </h4>
-            </div>
-            {/* More UI elements */}
+
+          <div className="col-md-2 col-sm-6 col-12">
+            <label htmlFor="balanceAmount" className="form-label">
+              Balance Amount
+            </label>
+            <input
+              type="text"
+              name="balanceAmount"
+              className="form-control"
+              id="balanceAmount"
+              value={curBalance}
+              disabled={true}
+            />
           </div>
+        </div>
+        <div>
+          {/* Your component's UI */}
+          <div className="col-md-4 custom-label text-with-border">
+            <h4
+              htmlFor="balanceAmount"
+              className={`fontkind ${
+                curBalance > 0 ? "text-success" : "text-danger"
+              }`}
+            >
+              Balance Amount:&nbsp; &nbsp;
+              {curBalance !== undefined ? curBalance : "N/A"}
+            </h4>
+          </div>
+          {/* More UI elements */}
         </div>
 
         <div className="col-md-2">
