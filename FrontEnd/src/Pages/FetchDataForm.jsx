@@ -5,8 +5,9 @@ import * as XLSX from "xlsx";
 import "../CSS/main.css";
 
 const FetchDataForm = () => {
-    const url =
-    "https://booktrust-backend.onrender.com";
+  // const url =
+  // "https://booktrust-backend.onrender.com";
+  const url = "http://localhost:8085";
   const [InputValues, setInputValues] = useState("");
 
   const [selectedQuery, setSelectedQuery] = useState("selectAll");
@@ -346,12 +347,9 @@ const FetchDataForm = () => {
   };
 
   const fetchYearlyData = async (year) => {
-    const response = await axios.get(
-      `${url}/api/fetchYearlyData`,
-      {
-        params: { year },
-      }
-    );
+    const response = await axios.get(`${url}/api/fetchYearlyData`, {
+      params: { year },
+    });
     return response.data.data || [];
   };
 
@@ -373,12 +371,9 @@ const FetchDataForm = () => {
 
       // console.log(params);
 
-      response = await axios.get(
-        `${url}/api/fetchSpecificYearlyData`,
-        {
-          params,
-        }
-      );
+      response = await axios.get(`${url}/api/fetchSpecificYearlyData`, {
+        params,
+      });
 
       return response.data.data || [];
     } catch (error) {
@@ -391,12 +386,9 @@ const FetchDataForm = () => {
   };
 
   const fetchMonthlyData = async (month) => {
-    const response = await axios.get(
-      `${url}/api/fetchMonthlyData`,
-      {
-        params: { month },
-      }
-    );
+    const response = await axios.get(`${url}/api/fetchMonthlyData`, {
+      params: { month },
+    });
     return response.data.data || [];
   };
 
@@ -416,12 +408,9 @@ const FetchDataForm = () => {
       }
       // console.log(params);
 
-      const response = await axios.get(
-        `${url}/api/fetchSpecificMonthlyData`,
-        {
-          params,
-        }
-      );
+      const response = await axios.get(`${url}/api/fetchSpecificMonthlyData`, {
+        params,
+      });
 
       return response.data.data || [];
     } catch (error) {
@@ -436,12 +425,9 @@ const FetchDataForm = () => {
   const fetchTimeFrameData = async (startDate, endDate) => {
     // console.log(startDate, endDate);
 
-    const response = await axios.get(
-       `${url}/api/fetchTimeFrameData`,
-      {
-        params: { startDate, endDate },
-      }
-    );
+    const response = await axios.get(`${url}/api/fetchTimeFrameData`, {
+      params: { startDate, endDate },
+    });
     return response.data.data || [];
   };
 
@@ -571,7 +557,9 @@ const FetchDataForm = () => {
             filteredItem["InvoiceNo"] = item["invoiceNo"];
           }
           if (bankFields.invoiceDate) {
-            filteredItem["InvoiceDate"] = new Date(item["invoiceDate"]).toISOString().split("T")[0];
+            filteredItem["InvoiceDate"] = new Date(item["invoiceDate"])
+              .toISOString()
+              .split("T")[0];
           }
           if (bankFields.invoiceAmount) {
             filteredItem["InvoiceAmount"] = item["totalOrderValue"];
@@ -592,7 +580,11 @@ const FetchDataForm = () => {
             filteredItem["AwbBillOfLadingNo"] = item["awb"];
           }
           if (bankFields.dateOfRemittance) {
-            filteredItem["DateOfRemittance"] = new Date(item["bankRemittanceDate"]).toISOString().split("T")[0];
+            filteredItem["DateOfRemittance"] = new Date(
+              item["bankRemittanceDate"]
+            )
+              .toISOString()
+              .split("T")[0];
           }
           if (bankFields.ModeOfRemmittance) {
             filteredItem["ModeOfRemmittance"] = item["modeOfPayment"];
@@ -616,10 +608,13 @@ const FetchDataForm = () => {
           }
           if (bankFields.amountInINR) {
             if (item["modeOfPayment"] === "PAYPAL") {
-              filteredItem["AmountInINR"] = `₹ ${item["outOfRemittanceForOrder"].toFixed(2)}`;
+              filteredItem["AmountInINR"] = `₹ ${item[
+                "outOfRemittanceForOrder"
+              ].toFixed(2)}`;
             } else {
-             filteredItem["AmountInINR"] = `₹ ${item["bankRemittanceAmount"].toFixed(2)}`;
-
+              filteredItem["AmountInINR"] = `₹ ${item[
+                "bankRemittanceAmount"
+              ].toFixed(2)}`;
             }
           }
 

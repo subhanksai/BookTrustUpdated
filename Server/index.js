@@ -11,11 +11,11 @@ const server = express();
 server.use(cors());
 server.use(express.json()); // Middleware to parse JSON body
 
-const url =
-  "mongodb+srv://admin:admin@backend.3fn3q.mongodb.net/BookTrust?retryWrites=true&w=majority&appName=BackEnd";
-
 // const url =
-//   "mongodb://127.0.0.1:27017/BookTrust?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.3.4";
+//   "mongodb+srv://admin:admin@backend.3fn3q.mongodb.net/BookTrust?retryWrites=true&w=majority&appName=BackEnd";
+
+const url =
+  "mongodb://127.0.0.1:27017/BookTrust?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.3.4";
 
 mongoose
   .connect(url)

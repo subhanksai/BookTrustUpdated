@@ -3,9 +3,10 @@ import { useState } from "react";
 import axios from "axios";
 import "../CSS/main.css";
 
-const BalancePage = () => {  
-  const url =
-    "https://booktrust-backend.onrender.com";
+const BalancePage = () => {
+  const url = "http://localhost:8085";
+  // const url =
+  //   "https://booktrust-backend.onrender.com";
   const [formData, setFormData] = useState({
     remitterCountry: "",
     paymentReferenceNo: "",
