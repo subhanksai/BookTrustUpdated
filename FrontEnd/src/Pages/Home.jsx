@@ -393,6 +393,8 @@ const OrderForm = () => {
     try {
       const newRecord = {
         ...formData,
+        balanceAmount: balanceAmount.toFixed(2),
+        outOfRemittanceForOrder: outOfRemittanceForOrder.toFixed(2),
         OrderCreatedAt: getISTTime(),
         OrderUpdatedAt: getISTTime(),
       };
@@ -410,108 +412,6 @@ const OrderForm = () => {
       alert("An error occurred. Please try again.");
     }
   };
-
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-
-  //   const params = {};
-
-  //   // Ensure remittercustomerId exists and is a string
-  //   if (
-  //     formData.remittercustomerId &&
-  //     typeof formData.remittercustomerId === "string"
-  //   ) {
-  //     // Add remittercustomerId to params with key 'i2'
-  //     params["i2"] = formData.remittercustomerId
-  //       .split(",")
-  //       .map((value) => value.trim())
-  //       .join(",");
-  //   }
-
-  //   const getISTTime = () => {
-  //     const utcDate = new Date(); // Get the current time in UTC
-
-  //     // Convert UTC to IST by adding the offset (5 hours 30 minutes)
-  //     const istOffset = 5.5 * 60 * 60000; // 5 hours 30 minutes in milliseconds
-  //     const istTime = new Date(utcDate.getTime() + istOffset);
-
-  //     return istTime;
-  //   };
-
-  //   try {
-  //     // Fetch data for the given remittercustomerId
-  //     const response = await axios.get("http://localhost:8085/api/getOrder", {
-  //       params,
-  //     });
-
-  //     console.log("API Response:", response.data); // Log the response for debugging
-
-  //     let existingOrder = response.data.orders?.[0]; // Check if the orders array exists and contains an order
-
-  //     if (existingOrder) {
-  //       console.log("Existing Order:", existingOrder);
-  //       delete existingOrder._id;
-  //       let updatedBalance = parseFloat(existingOrder.balanceAmount) || 0; // Get the existing balance
-
-  //       // Update balance based on the payment method
-  //       if (formData.modeOfPayment === "PAYPAL") {
-  //         updatedBalance += parseFloat(formData.outOfRemittanceForOrder) || 0;
-  //       } else {
-  //         updatedBalance += parseFloat(formData.bankRemittanceAmount) || 0;
-  //       }
-
-  //       // Prepare the new record with the updated balance
-
-  //       const newRecord = {
-  //         ...formData,
-
-  //         balanceAmount: updatedBalance.toFixed(2),
-  //         OrderCreatedAt: existingOrder.OrderCreatedAt,
-  //         OrderUpdatedAt: getISTTime(),
-  //       };
-
-  //       // Create or update the record in the database
-  //       const postResponse = await axios.post(
-  //         "http://localhost:8085/api/updateOrder",
-  //         newRecord
-  //       );
-
-  //       console.log("Record created/updated successfully:", postResponse.data);
-  //       alert("Record created/updated successfully!");
-  //     } else {
-  //       let updatedBalance = 0;
-  //       // Set balance based on the payment method
-  //       if (formData.modeOfPayment === "PAYPAL") {
-  //         updatedBalance = parseFloat(formData.outOfRemittanceForOrder) || 0;
-  //       } else {
-  //         updatedBalance = parseFloat(formData.bankRemittanceAmount) || 0;
-  //       }
-
-  //       // Prepare the new record for creating a new entry
-
-  //       const newRecord = {
-  //         ...formData,
-  //         balanceAmount: updatedBalance.toFixed(2),
-  //         OrderCreatedAt: getISTTime(),
-  //         OrderUpdatedAt: getISTTime(),
-  //       };
-
-  //       console.log("New Record (Creating new order):", newRecord);
-
-  //       // Create the new record in the database
-  //       const postResponse = await axios.post(
-  //         "http://localhost:8085/api/create",
-  //         newRecord
-  //       );
-
-  //       console.log("Record created successfully:", postResponse.data);
-  //       alert("Record created successfully!");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error during API call:", error);
-  //     alert("An error occurred. Please try again.");
-  //   }
-  // };
 
   return (
     <div

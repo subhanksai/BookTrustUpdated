@@ -582,6 +582,7 @@ const UpdateForm = () => {
     // Prepare the updated form data
     const updatedFormData = {
       ...formData,
+      balanceAmount: balanceAmount.toFixed(2),
 
       ...(transactionType === "cancel" && {
         isCancelled: true,
@@ -609,7 +610,7 @@ const UpdateForm = () => {
     // Correct way to update updatedFormData
     updatedFormData.OrderUpdatedAt = ISTTime();
 
-    console.log(updatedFormData.OrderUpdatedAt);
+    // console.log(updatedFormData.OrderUpdatedAt);
 
     // Handle transactions based on type
     if (transactionType === "new" || transactionType === "cancel") {
