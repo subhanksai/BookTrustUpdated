@@ -608,13 +608,11 @@ const FetchDataForm = () => {
           }
           if (bankFields.amountInINR) {
             if (item["modeOfPayment"] === "PAYPAL") {
-              filteredItem["AmountInINR"] = `₹ ${item[
-                "outOfRemittanceForOrder"
-              ].toFixed(2)}`;
+              filteredItem[
+                "AmountInINR"
+              ] = `₹ ${item["outOfRemittanceForOrder"]}`;
             } else {
-              filteredItem["AmountInINR"] = `₹ ${item[
-                "bankRemittanceAmount"
-              ].toFixed(2)}`;
+              filteredItem["AmountInINR"] = `₹ ${item["bankRemittanceAmount"]}`;
             }
           }
 

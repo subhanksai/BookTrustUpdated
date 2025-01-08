@@ -89,66 +89,16 @@ const OrderForm = () => {
 
   function calculateOutOfRemittance(paidByPaypal, exchangeRate) {
     if (paidByPaypal && exchangeRate) {
+      console.log(exchangeRate);
+
       const updatedOutOfRemittance = paidByPaypal * exchangeRate;
-      return updatedOutOfRemittance;
+      console.log(parseFloat(updatedOutOfRemittance.toFixed(2)));
+
+      return parseFloat(updatedOutOfRemittance.toFixed(2)); // Ensures a float with 2 decimal precision
     }
-    return 0; // Return 0 if no valid inputs
+    return 0.0; // Return 0.0 as a float
   }
 
-  // useEffect(() => {
-  //   // Only calculate balanceAmount when outOfRemittanceForOrder, totalOrderValue, and edpms are available
-  //   if (
-  //     formData.outOfRemittanceForOrder &&
-  //     formData.totalOrderValue &&
-  //     formData.edpms
-  //   ) {
-  //     const outOfRemittance = parseFloat(formData.outOfRemittanceForOrder);
-  //     const totalOrderValue = parseFloat(formData.totalOrderValue);
-  //     const edpms = parseFloat(formData.edpms);
-
-  //     const updatedBalanceAmount = outOfRemittance - (totalOrderValue + edpms);
-
-  //     setFormData((prevData) => ({
-  //       ...prevData,
-  //       balanceAmount: updatedBalanceAmount, // Store as a number
-  //     }));
-  //   }
-  // }, [
-  //   formData.outOfRemittanceForOrder,
-  //   formData.totalOrderValue,
-  //   formData.edpms,
-  // ]);
-  // useEffect(() => {
-  //   const {
-  //     balanceAmount,
-  //     outOfRemittanceForOrder,
-  //     bankRemittanceAmount,
-  //     modeOfPayment,
-  //   } = formData;
-
-  //   // If balanceAmount exists, retain it and don't update it
-  //   if (balanceAmount !== undefined && balanceAmount !== null) {
-  //     setPrevBalance(balanceAmount);
-  //     setCurBalance(balanceAmount); // Retain formData.balanceAmount
-  //   } else {
-  //     // If balanceAmount doesn't exist, calculate the balance based on payment method
-  //     let updatedBalance = 0;
-
-  //     if (modeOfPayment === "PAYPAL") {
-  //       updatedBalance = parseFloat(outOfRemittanceForOrder) || 0; // Use outOfRemittanceForOrder if PAYPAL
-  //     } else {
-  //       updatedBalance = parseFloat(bankRemittanceAmount) || 0; // Use bankRemittanceAmount otherwise
-  //     }
-
-  //     setPrevBalance(updatedBalance);
-  //     setCurBalance(updatedBalance); // Update both prevBalance and curBalance
-  //   }
-  // }, [
-  //   formData.balanceAmount,
-  //   formData.outOfRemittanceForOrder,
-  //   formData.bankRemittanceAmount,
-  //   formData.modeOfPayment,
-  // ]);
   function calculateRemainingBalanceForNew(val1, val2, total) {
     console.log("Inputs:", val1, val2, total);
 
@@ -175,7 +125,8 @@ const OrderForm = () => {
         [name]: updatedValue, // Dynamically update the field
       };
 
-      console.log("Updated Form Data:", updatedData);
+      // console.log("Updated Form Data:", updatedData);
+      console.log("Here", prevBalance);
 
       // Start with the current balance (updated dynamically)
       let updatedBalance = prevBalance || 0;
@@ -268,8 +219,7 @@ const OrderForm = () => {
   const handleChange = (e) => {
     const { id, value } = e.target;
     const idParts = id.split(".");
-    setPrevBalance(curBalance); //Newly added
-    // Update formData based on nested or flat object
+
     setFormData((prevState) => {
       let updatedState = { ...prevState };
       let nestedObject = updatedState;
@@ -279,21 +229,9 @@ const OrderForm = () => {
         if (index === idParts.length - 1) {
           nestedObject[part] = value; // Assign the value to the last part
         } else {
-          // Traverse deeper into the nested object
           nestedObject = nestedObject[part];
         }
       });
-
-      // Now check if the relevant fields are updated and calculate outOfRemittanceForOrder
-      const updatedOutOfRemittance = calculateOutOfRemittance(
-        updatedState.paidByPaypal,
-        updatedState.exchangeRate
-      );
-
-      // Set the updated outOfRemittanceForOrder in formData
-      updatedState.outOfRemittanceForOrder = updatedOutOfRemittance;
-
-      // Calculate the updated balance based on the mode of payment
 
       return updatedState;
     });
@@ -334,14 +272,46 @@ const OrderForm = () => {
     }));
   };
 
-  const handleBalanceCheck = (e) => {
-    const { id, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [id]: value,
-    }));
-  };
+  // const handleBalanceCheck = (e) => {
+  //   const { id, value } = e.target;
+  //   setFormData((prevData) => ({
+  //     ...prevData,
+  //     [id]: value,
+  //   }));
+  // };
   const [customerFound, setCustomerFound] = useState(null);
+
+  const updateExchange = async (e) => {
+    const { id, value } = e.target;
+    e.preventDefault();
+
+    setFormData((prevState) => {
+      const updatedState = { ...prevState, [id]: value }; // Update the specific field dynamically
+
+      if (updatedState.modeOfPayment === "PAYPAL") {
+        console.log("here");
+
+        const updatedOutOfRemittance = calculateOutOfRemittance(
+          updatedState.paidByPaypal,
+          updatedState.exchangeRate
+        );
+
+        // Set the updated outOfRemittanceForOrder in formData
+        updatedState.outOfRemittanceForOrder = updatedOutOfRemittance;
+        setPrevBalance(updatedOutOfRemittance);
+        setCurBalance(updatedOutOfRemittance);
+      } else {
+        const updatedBalance =
+          parseFloat(updatedState.bankRemittanceAmount) || 0;
+
+        setPrevBalance(updatedBalance);
+        setCurBalance(updatedBalance);
+      }
+
+      return updatedState;
+    });
+  };
+
   const handleSearch = async (e) => {
     e.preventDefault();
     const params = {};
@@ -579,9 +549,10 @@ const OrderForm = () => {
                 className="form-control"
                 id="exchangeRate"
                 value={formData.exchangeRate}
-                onChange={handleChange}
+                onChange={updateExchange}
               />
             </div>
+
             <div className="col-md-4">
               <label htmlFor="paypalTransactionId" className="form-label">
                 PayPal Transaction ID
@@ -618,7 +589,7 @@ const OrderForm = () => {
             placeholder="INR"
             id="bankRemittanceAmount"
             value={formData.bankRemittanceAmount}
-            onChange={handleChange}
+            onChange={updateExchange}
           />
         </div>
         <div className="col-md-4">
@@ -840,17 +811,26 @@ const OrderForm = () => {
                 className="form-control"
                 id="remittercustomerId"
                 value={formData.remittercustomerId}
-                onChange={handleBalanceCheck}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    remittercustomerId: e.target.value,
+                  })
+                }
               />
             </div>
             <div
-              className="btn btn-primary mt-3"
-              onClick={handleSearch} // Trigger the function on div click
+              className={`btn btn-primary mt-3 ${
+                !formData.remittercustomerId ? "disabled" : ""
+              }`}
+              onClick={formData.remittercustomerId ? handleSearch : null} // Only trigger if input is not empty
               style={{
-                cursor: "pointer",
+                cursor: formData.remittercustomerId ? "pointer" : "not-allowed",
                 display: "inline-block",
                 padding: "10px 20px",
-                backgroundColor: "#007bff",
+                backgroundColor: formData.remittercustomerId
+                  ? "#007bff"
+                  : "#6c757d",
                 color: "#fff",
                 borderRadius: "5px",
               }}
