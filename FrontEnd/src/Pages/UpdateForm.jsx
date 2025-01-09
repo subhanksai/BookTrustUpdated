@@ -19,22 +19,22 @@ const UpdateForm = () => {
   const [transactionType, setTransactionType] = useState("no");
 
   const [outOfRemittanceAmount, setoutOfRemittanceAmount] = useState();
+
   const [formData, setFormData] = useState({
-    remitterCountry: "",
-    paymentReferenceNo: "",
+    slNo: "",
     orderProformaNo: "",
-    amountPaid: "",
     paypalInvoiceNo: "",
     paypalInvoiceDate: "",
     paypalInvoiceAmount: "",
     currencyType: "",
-    paidByPaypal: "",
-    exchangeRate: "",
+    amountPaid: "",
     paypalTransactionId: "",
     bankRemittanceDate: "",
     bankRemittanceAmount: "",
     bankRemittanceNo: "",
-    outOfRemittanceForOrder: "",
+    paidByPaypal: 0,
+    exchangeRate: 0,
+    outOfRemittanceForOrder: 0,
     firc: "",
     buyercustomerId: "",
     buyerDetails: {
@@ -62,11 +62,12 @@ const UpdateForm = () => {
     },
     osrNo: "",
     osrDate: "",
+    invoiceNo: "",
+    invoiceDate: "",
     edpms: "",
     totalOrderValue: "",
     balanceAmount: "",
     awb: "",
-    sb: "",
     sbd: "",
 
     sbAddress: {
@@ -86,8 +87,9 @@ const UpdateForm = () => {
     yesNoOption: "no",
     portCode: "",
     modeOfPayment: "",
-    ReasonforCancellation: "",
-    isCancelled: false,
+
+    isSameAsBuyer: false,
+    OrderCreatedAt: "",
     OrderUpdatedAt: "",
   });
   const [curBalance, setCurBalance] = useState("");
@@ -578,11 +580,15 @@ const UpdateForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
+    const safeNumber = (value, defaultValue = 0) => {
+      const num = parseFloat(value);
+      return isNaN(num) ? defaultValue : num;
+    };
+    const numericBalanceAmount = safeNumber(formData.balanceAmount);
     // Prepare the updated form data
     const updatedFormData = {
       ...formData,
-      balanceAmount: balanceAmount.toFixed(2),
+      balanceAmount: numericBalanceAmount.toFixed(2),
 
       ...(transactionType === "cancel" && {
         isCancelled: true,
@@ -590,11 +596,7 @@ const UpdateForm = () => {
     };
 
     // Remove _id if it's a new or cancel transaction
-    if (
-      transactionType === "new" ||
-      transactionType === "update" ||
-      transactionType === "cancel"
-    ) {
+    if (transactionType === "new" || transactionType === "cancel") {
       delete updatedFormData._id;
     }
     const ISTTime = () => {
@@ -626,11 +628,26 @@ const UpdateForm = () => {
           console.error("Error submitting transaction:", error);
           alert("Failed to submit transaction. Please try again.");
         });
-    } else if (transactionType === "update") {
+    }
+    // else if (transactionType === "update") {
+    //   // Make a PUT request for updating an existing transaction
+    //   axios
+    //     // .put("http://localhost:8085/api/updateOrder", updatedFormData)
+    //     .post(`${url}/api/updateOrder`, updatedFormData)
+    //     .then((response) => {
+    //       console.log("Order updated successfully:", response.data);
+    //       alert("Order updated successfully");
+    //       setFormData(updatedFormData); // Update state if necessary
+    //     })
+    //     .catch((error) => {
+    //       console.error("Error updating order:", error);
+    //       alert("Failed to update order. Please try again.");
+    //     });
+    // }
+    else if (transactionType === "update") {
       // Make a PUT request for updating an existing transaction
       axios
-        // .put("http://localhost:8085/api/updateOrder", updatedFormData)
-        .post(`${url}/api/create`, updatedFormData)
+        .put(`${url}/api/updateOrder`, updatedFormData) // Change POST to PUT if needed
         .then((response) => {
           console.log("Order updated successfully:", response.data);
           alert("Order updated successfully");

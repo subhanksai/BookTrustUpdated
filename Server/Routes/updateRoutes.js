@@ -54,20 +54,80 @@ async function processData(data) {
 // Export the function to be used in server.js
 module.exports = { processData };
 
-// API to update order data
-server.post("/updateOrder", async (req, res) => {
-  // POST route to receive data from fronten
+// server.post("/updateOrder", async (req, res) => {
+//   // POST route to receive data from fronten
+//   try {
+//     const receivedData = req.body;
+//     // console.log("Received data:", receivedData);
+
+//     // Forward the data to processData function
+//     const response = await processData(receivedData);
+
+//     // Send a response back to the client
+//     res.status(200).json({
+//       message: "Data received and processed successfully",
+//       data: response,
+//     });
+//   } catch (error) {
+//     console.error("Error processing the data:", error);
+//     res.status(500).json({ error: "Failed to process the data" });
+//   }
+// });
+server.put("/updateOrder", async (req, res) => {
+  console.log(req.body);
   try {
-    const receivedData = req.body;
-    // console.log("Received data:", receivedData);
+    const receivedData = req.body; // Receiving the complete data from frontend
 
-    // Forward the data to processData function
-    const response = await processData(receivedData);
+    const {
+      orderProformaNo,
+      paypalInvoiceNo,
+      paypalTransactionId,
+      invoiceNo,
+      ...updateFields
+    } = receivedData; // Destructuring to get identifier fields and the rest
 
-    // Send a response back to the client
+    // Validate that at least one identifier field is provided
+    if (
+      !orderProformaNo &&
+      !paypalInvoiceNo &&
+      !paypalTransactionId &&
+      !invoiceNo
+    ) {
+      return res
+        .status(400)
+        .json({ error: "At least one identifier field is required" });
+    }
+
+    // Build the query to find the record based on one of the identifier fields
+    const query = {};
+    if (orderProformaNo) query.orderProformaNo = orderProformaNo;
+    if (paypalInvoiceNo) query.paypalInvoiceNo = paypalInvoiceNo;
+    if (paypalTransactionId) query.paypalTransactionId = paypalTransactionId;
+    if (invoiceNo) query.invoiceNo = invoiceNo;
+
+    // Fetch the order using the getOrder logic
+    const orders = await FormDataSchema.find(query)
+      .sort({ OrderUpdatedAt: -1 }) // Sort by OrderUpdatedAt in descending order
+      .limit(1); // Fetch only the latest order
+
+    if (!orders || orders.length === 0) {
+      return res.status(404).json({ error: "No matching order found" });
+    }
+
+    const orderToUpdate = orders[0]; // Get the first (latest) order
+
+    // Update the order with the received fields
+    Object.keys(updateFields).forEach((field) => {
+      orderToUpdate[field] = updateFields[field]; // Update the order fields with new data
+    });
+
+    // Save the updated order
+    await orderToUpdate.save();
+
+    // Send a success response with the updated order
     res.status(200).json({
-      message: "Data received and processed successfully",
-      data: response,
+      message: "Order updated successfully",
+      data: orderToUpdate,
     });
   } catch (error) {
     console.error("Error processing the data:", error);

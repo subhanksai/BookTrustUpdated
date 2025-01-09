@@ -722,8 +722,85 @@ const FetchDataForm = () => {
             placeholder="Enter multiple values separated by commas"
           />
         </div>
-
         <div className="mb-3">
+          <label className="form-label">Identify Fields:</label>
+          <div>
+            <div className="form-check">
+              <input
+                type="radio"
+                id="orderProforma"
+                name="identifyField"
+                className="form-check-input"
+                checked={isOrderProformaChecked}
+                onChange={() =>
+                  setIsOrderProformaChecked(true) ||
+                  setIsCustomerIdChecked(false) ||
+                  setIsInvoiceChecked(false) ||
+                  setIsPaypalInvoiceChecked(false)
+                }
+              />
+              <label className="form-check-label" htmlFor="orderProforma">
+                Order Proforma
+              </label>
+            </div>
+            <div className="form-check">
+              <input
+                type="radio"
+                id="customerId"
+                name="identifyField"
+                className="form-check-input"
+                checked={isCustomerIdChecked}
+                onChange={() =>
+                  setIsCustomerIdChecked(true) ||
+                  setIsOrderProformaChecked(false) ||
+                  setIsInvoiceChecked(false) ||
+                  setIsPaypalInvoiceChecked(false)
+                }
+              />
+              <label className="form-check-label" htmlFor="customerId">
+                Customer ID
+              </label>
+            </div>
+            <div className="form-check">
+              <input
+                type="radio"
+                id="InvoiceNo"
+                name="identifyField"
+                className="form-check-input"
+                checked={isInvoiceChecked}
+                onChange={() =>
+                  setIsInvoiceChecked(true) ||
+                  setIsOrderProformaChecked(false) ||
+                  setIsCustomerIdChecked(false) ||
+                  setIsPaypalInvoiceChecked(false)
+                }
+              />
+              <label className="form-check-label" htmlFor="InvoiceNo">
+                Invoice No
+              </label>
+            </div>
+            <div className="form-check">
+              <input
+                type="radio"
+                id="PayPalInvoiceNo"
+                name="identifyField"
+                className="form-check-input"
+                checked={isPaypalInvoiceChecked}
+                onChange={() =>
+                  setIsPaypalInvoiceChecked(true) ||
+                  setIsOrderProformaChecked(false) ||
+                  setIsCustomerIdChecked(false) ||
+                  setIsInvoiceChecked(false)
+                }
+              />
+              <label className="form-check-label" htmlFor="PayPalInvoiceNo">
+                Paypal Invoice No
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {/* <div className="mb-3">
           <label className="form-label">Identify Fields:</label>
           <div>
             <div className="form-check">
@@ -779,7 +856,7 @@ const FetchDataForm = () => {
               </label>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <div className="mb-3">
           <label htmlFor="querySelect" className="form-label">

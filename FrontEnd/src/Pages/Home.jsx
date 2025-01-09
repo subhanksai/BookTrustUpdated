@@ -129,7 +129,7 @@ const OrderForm = () => {
       console.log("Here", prevBalance);
 
       // Start with the current balance (updated dynamically)
-      let updatedBalance = prevBalance || 0;
+      let updatedBalance = prevBalance;
 
       // Calculate the remaining balance using updated values
       const edpmsAmount = parseFloat(updatedData.edpms) || 0;
@@ -325,7 +325,7 @@ const OrderForm = () => {
         .map((value) => value.trim())
         .join(",");
     }
-
+    //
     try {
       const response = await axios.get(`${url}/api/getOrder`, { params });
       console.log("API Response:", response.data);
@@ -351,7 +351,6 @@ const OrderForm = () => {
       alert("An error occurred. Please try again.");
     }
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -359,26 +358,44 @@ const OrderForm = () => {
       const istOffset = 5.5 * 60 * 60000; // 5 hours 30 minutes in milliseconds
       return new Date(Date.now() + istOffset).toISOString();
     };
+    const safeNumber = (value, defaultValue = 0) => {
+      const num = parseFloat(value);
+      return isNaN(num) ? defaultValue : num;
+    };
 
     try {
+      // Use safeNumber for balanceAmount
+      const numericBalanceAmount = safeNumber(balanceAmount);
+
+      // Prepare remittance field based on modeOfPayment
+      let remittanceField = {};
+      if (formData.modeOfPayment === "PAYPAL") {
+        remittanceField.outOfRemittanceForOrder = safeNumber(
+          outOfRemittanceForOrder
+        ).toFixed(2);
+      } else {
+        remittanceField.bankRemittanceAmount =
+          safeNumber(bankRemittanceAmount).toFixed(2);
+      }
+
+      // Construct the new record
       const newRecord = {
         ...formData,
-        balanceAmount: balanceAmount.toFixed(2),
-        outOfRemittanceForOrder: outOfRemittanceForOrder.toFixed(2),
+        balanceAmount: numericBalanceAmount.toFixed(2),
+        ...remittanceField, // Add the conditional remittance field
         OrderCreatedAt: getISTTime(),
         OrderUpdatedAt: getISTTime(),
       };
 
       console.log("New Record (Creating new order):", newRecord);
 
+      // Make the API call
       const postResponse = await axios.post(`${url}/api/create`, newRecord);
       console.log("Record created successfully:", postResponse.data);
       alert("Record created successfully!");
       window.location.reload();
-
-      // Reset form data and state instead of refreshing
     } catch (error) {
-      console.error("Error during API call:", error);
+      console.error("Error during API call:", error.message);
       alert("An error occurred. Please try again.");
     }
   };
