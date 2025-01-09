@@ -8,7 +8,7 @@
     "server": "nodemon Server/index.js",
     "frontend": "npm run dev --prefix FrontEnd",
     "dev": "concurrently \"brew services start mongodb/brew/mongodb-community\" \"npm run server\"  \"npm run frontend\" ",
-    "install-all": "npm install --prefix FrontEnd && npm install --prefix Server",
+    "install-all": "npm install --prefix FrontEnd && npm install --prefix Server && npm install nodemon && npm install concurrently",
     "build": "vite build",
     "start-db": "brew services start mongodb/brew/mongodb-community",
     "stop-db": "brew services stop mongodb/brew/mongodb-community",
