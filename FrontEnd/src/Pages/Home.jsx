@@ -152,6 +152,39 @@ const OrderForm = () => {
   // console.log("Prev", prevBalance);
 
   // Use the context values
+  // const handleCheckboxChange = (e) => {
+  //   const isChecked = e.target.checked;
+
+  //   setFormData((prevState) => {
+  //     if (isChecked) {
+  //       // If checked, copy all relevant fields from buyerDetails to remitterDetails
+  //       return {
+  //         ...prevState,
+  //         remitterDetails: {
+  //           ...prevState.buyerDetails, // Copy everything from buyerDetails to remitterDetails
+  //           remitterAddress: { ...prevState.buyerDetails.buyerAddress }, // Copy address as well
+  //         },
+  //         isSameAsBuyer: true,
+  //       };
+  //     } else {
+  //       // If unchecked, reset both personal and address fields for remitterDetails
+  //       return {
+  //         ...prevState,
+  //         remitterDetails: {
+  //           Name: "",
+  //           address1: "",
+  //           address2: "",
+  //           city: "",
+  //           state: "",
+  //           zip: "",
+  //           Phone: "",
+  //           Email: "",
+  //         },
+  //         isSameAsBuyer: false,
+  //       };
+  //     }
+  //   });
+  // };
   const handleCheckboxChange = (e) => {
     const isChecked = e.target.checked;
 
@@ -164,6 +197,7 @@ const OrderForm = () => {
             ...prevState.buyerDetails, // Copy everything from buyerDetails to remitterDetails
             remitterAddress: { ...prevState.buyerDetails.buyerAddress }, // Copy address as well
           },
+          remittercustomerId: prevState.buyercustomerId, // Set remittercustomerId same as buyercustomerId
           isSameAsBuyer: true,
         };
       } else {
@@ -180,11 +214,13 @@ const OrderForm = () => {
             Phone: "",
             Email: "",
           },
+          remittercustomerId: "", // Reset remittercustomerId
           isSameAsBuyer: false,
         };
       }
     });
   };
+
   const handleSBAddressCheckboxChange = (e) => {
     const isChecked = e.target.checked;
 
