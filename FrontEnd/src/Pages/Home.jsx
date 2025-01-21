@@ -415,6 +415,7 @@ const OrderForm = () => {
     if (form.checkValidity() === false) {
       // Add the 'was-validated' class to trigger Bootstrap's invalid styles
       form.classList.add("was-validated");
+      alert("Please fill out all required fields.");
       return; // Exit early if the form is not valid
     }
 
