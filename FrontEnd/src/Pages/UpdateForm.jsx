@@ -422,6 +422,47 @@ const UpdateForm = () => {
     }
     // console.log(formData.ReasonforCancellation);
   };
+  function calculateOutOfRemittance(paidByPaypal, exchangeRate) {
+    if (paidByPaypal && exchangeRate) {
+      console.log(exchangeRate);
+
+      const updatedOutOfRemittance = paidByPaypal * exchangeRate;
+      console.log(parseFloat(updatedOutOfRemittance.toFixed(2)));
+
+      return parseFloat(updatedOutOfRemittance.toFixed(2)); // Ensures a float with 2 decimal precision
+    }
+    return 0.0; // Return 0.0 as a float
+  }
+  const updateExchange = async (e) => {
+    const { id, value } = e.target;
+    e.preventDefault();
+
+    setFormData((prevState) => {
+      const updatedState = { ...prevState, [id]: value }; // Update the specific field dynamically
+
+      if (updatedState.modeOfPayment === "PAYPAL") {
+        console.log("here");
+
+        const updatedOutOfRemittance = calculateOutOfRemittance(
+          updatedState.paidByPaypal,
+          updatedState.exchangeRate
+        );
+
+        // Set the updated outOfRemittanceForOrder in formData
+        updatedState.outOfRemittanceForOrder = updatedOutOfRemittance;
+        setPrevBalance(updatedOutOfRemittance);
+        setCurBalance(updatedOutOfRemittance);
+      } else {
+        const updatedBalance =
+          parseFloat(updatedState.bankRemittanceAmount) || 0;
+
+        setPrevBalance(updatedBalance);
+        setCurBalance(updatedBalance);
+      }
+
+      return updatedState;
+    });
+  };
   //SB Address - Replicate
   const handleSBAddressCheckboxChange = (e) => {
     const isChecked = e.target.checked;
@@ -622,6 +663,7 @@ const UpdateForm = () => {
         .then((response) => {
           console.log("Transaction submitted successfully:", response.data);
           alert("Transaction submitted successfully");
+          window.location.reload();
           setFormData(updatedFormData); // Update state if necessary
         })
         .catch((error) => {
@@ -647,10 +689,11 @@ const UpdateForm = () => {
     else if (transactionType === "update") {
       // Make a PUT request for updating an existing transaction
       axios
-        .put(`${url}/api/updateOrder`, updatedFormData) // Change POST to PUT if needed
+        .put(`${url}/api/UpdateOrder`, updatedFormData) // Change POST to PUT if needed
         .then((response) => {
           console.log("Order updated successfully:", response.data);
           alert("Order updated successfully");
+          window.location.reload();
           setFormData(updatedFormData); // Update state if necessary
         })
         .catch((error) => {
@@ -976,7 +1019,6 @@ const UpdateForm = () => {
                 id="amountPaid"
                 value={formData.amountPaid}
                 onChange={handleChange}
-                disabled={true}
               />
             </div>
             <div className="col-md-1">
@@ -990,7 +1032,6 @@ const UpdateForm = () => {
                 id="currencyType"
                 value={formData.currencyType}
                 onChange={handleChange}
-                disabled={true}
               />
             </div>
           </>
@@ -1008,7 +1049,6 @@ const UpdateForm = () => {
                 id="paypalInvoiceNo"
                 value={formData.paypalInvoiceNo}
                 onChange={handleChange}
-                disabled={true}
               />
             </div>
 
@@ -1028,7 +1068,6 @@ const UpdateForm = () => {
                     : ""
                 }
                 onChange={handleChange}
-                disabled={true}
               />
             </div>
             <div className="col-md-3">
@@ -1041,7 +1080,6 @@ const UpdateForm = () => {
                 id="paypalInvoiceAmount"
                 value={formData.paypalInvoiceAmount}
                 onChange={handleChange}
-                disabled={true}
               />
             </div>
             <div className="col-md-1">
@@ -1055,7 +1093,6 @@ const UpdateForm = () => {
                 id="currencyType"
                 value={formData.currencyType}
                 onChange={handleChange}
-                disabled={true}
               />
             </div>
 
@@ -1069,7 +1106,6 @@ const UpdateForm = () => {
                 id="paidByPaypal"
                 value={formData.paidByPaypal}
                 onChange={handleChange}
-                disabled={true}
               />
             </div>
             <div className="col-md-3">
@@ -1081,8 +1117,7 @@ const UpdateForm = () => {
                 className="form-control"
                 id="exchangeRate"
                 value={formData.exchangeRate}
-                onChange={handleChange}
-                disabled={true}
+                onChange={updateExchange}
               />
             </div>
             <div className="col-md-4">
@@ -1095,7 +1130,6 @@ const UpdateForm = () => {
                 id="paypalTransactionId"
                 value={formData.paypalTransactionId}
                 onChange={handleChange}
-                disabled={true}
               />
             </div>
           </>
@@ -1119,20 +1153,19 @@ const UpdateForm = () => {
                 : ""
             }
             onChange={handleChange}
-            disabled={true}
           />
         </div>
         <div className="col-md-4">
           <label htmlFor="bankRemittanceAmount" className="form-label">
-            Bank Remittance Amount
+            Bank Remittance Amount (INR)
           </label>
           <input
             type="number"
             className="form-control"
+            placeholder="INR"
             id="bankRemittanceAmount"
             value={formData.bankRemittanceAmount}
-            onChange={handleChange}
-            disabled={true}
+            onChange={updateExchange}
           />
         </div>
         <div className="col-md-4">
@@ -1145,7 +1178,6 @@ const UpdateForm = () => {
             id="bankRemittanceNo"
             value={formData.bankRemittanceNo}
             onChange={handleChange}
-            disabled={true}
           />
         </div>
         {formData.modeOfPayment === "PAYPAL" && (
@@ -1176,7 +1208,6 @@ const UpdateForm = () => {
                 className="form-control"
                 id="firc"
                 value={formData.firc}
-                disabled={true}
                 onChange={handleChange}
               />
             </div>
@@ -1186,7 +1217,7 @@ const UpdateForm = () => {
 
         {/* Buyer Details Section */}
         <div>
-          <fieldset disabled={true}>
+          <fieldset>
             <h4 className="mt-3">Buyer Details</h4>
             <div className="row">
               {/* Buyer Customer ID */}
@@ -1342,7 +1373,6 @@ const UpdateForm = () => {
             id="sameAddress"
             checked={formData.isSameAsBuyer}
             onChange={handleCheckboxChange}
-            disabled={true}
           />
           <label className="form-check-label" htmlFor="sameAddress">
             Remitter Address is the same as Buyer Address
@@ -1352,7 +1382,7 @@ const UpdateForm = () => {
         {/* Remitter Address Section */}
         <div>
           <h4 className="mb-3 mt-3">Remitter Details</h4>
-          <fieldset disabled={true}>
+          <fieldset>
             <div className="col-md-2">
               <label htmlFor="remittercustomerId" className="form-label">
                 Remitter Customer ID
@@ -1502,7 +1532,6 @@ const UpdateForm = () => {
             id="osrNo"
             value={formData.osrNo}
             onChange={handleChange}
-            disabled={true}
           />
         </div>
         <div className="col-md-3">
@@ -1519,7 +1548,6 @@ const UpdateForm = () => {
                 : ""
             }
             onChange={handleChange}
-            disabled={true}
           />
         </div>
         <div></div>
@@ -1830,7 +1858,7 @@ const UpdateForm = () => {
         {/* Submit Button */}
         <div className="col-12 text-center mt-5 mb-5 d-grid gap-2">
           <button type="submit" className="btn btn-success px-4 ">
-            Submit
+            Update Order
           </button>
         </div>
       </form>

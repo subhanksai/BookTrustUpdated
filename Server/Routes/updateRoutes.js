@@ -73,8 +73,71 @@ module.exports = { processData };
 //     res.status(500).json({ error: "Failed to process the data" });
 //   }
 // });
-server.put("/updateOrder", async (req, res) => {
-  console.log(req.body);
+// server.put("/UpdateOrder", async (req, res) => {
+//   console.log("Here", req.body);
+//   try {
+//     const receivedData = req.body; // Receiving the complete data from frontend
+
+//     const {
+//       orderProformaNo,
+//       paypalInvoiceNo,
+//       paypalTransactionId,
+//       invoiceNo,
+//       ...updateFields
+//     } = receivedData; // Destructuring to get identifier fields and the rest
+
+//     // Validate that at least one identifier field is provided
+//     if (
+//       !orderProformaNo &&
+//       !paypalInvoiceNo &&
+//       !paypalTransactionId &&
+//       !invoiceNo
+//     ) {
+//       return res
+//         .status(400)
+//         .json({ error: "At least one identifier field is required" });
+//     }
+
+//     // Build the query to find the record based on one of the identifier fields
+//     const query = {};
+//     if (orderProformaNo) query.orderProformaNo = orderProformaNo;
+//     if (paypalInvoiceNo) query.paypalInvoiceNo = paypalInvoiceNo;
+//     if (paypalTransactionId) query.paypalTransactionId = paypalTransactionId;
+//     if (invoiceNo) query.invoiceNo = invoiceNo;
+//     console.log("query", query);
+
+//     // Fetch the order using the getOrder logic
+//     const orders = await FormDataSchema.find(query)
+//       .sort({ OrderUpdatedAt: -1 }) // Sort by OrderUpdatedAt in descending order
+//       .limit(1); // Fetch only the latest order
+//     console.log("Orders", orders);
+
+//     if (!orders || orders.length === 0) {
+//       return res.status(404).json({ error: "No matching order found" });
+//     }
+
+//     const orderToUpdate = orders[0]; // Get the first (latest) order
+
+//     // Update the order with the received fields
+//     Object.keys(updateFields).forEach((field) => {
+//       orderToUpdate[field] = updateFields[field]; // Update the order fields with new data
+//     });
+
+//     // Save the updated order
+//     await orderToUpdate.save();
+
+//     // Send a success response with the updated order
+//     res.status(200).json({
+//       message: "Order updated successfully",
+//       data: orderToUpdate,
+//     });
+//   } catch (error) {
+//     console.error("Error processing the data:", error);
+//     res.status(500).json({ error: "Failed to process the data" });
+//   }
+// });
+server.put("/UpdateOrder", async (req, res) => {
+  console.log("Here", req.body);
   try {
     const receivedData = req.body; // Receiving the complete data from frontend
 
@@ -98,28 +161,33 @@ server.put("/updateOrder", async (req, res) => {
         .json({ error: "At least one identifier field is required" });
     }
 
-    // Build the query to find the record based on one of the identifier fields
-    const query = {};
-    if (orderProformaNo) query.orderProformaNo = orderProformaNo;
-    if (paypalInvoiceNo) query.paypalInvoiceNo = paypalInvoiceNo;
-    if (paypalTransactionId) query.paypalTransactionId = paypalTransactionId;
-    if (invoiceNo) query.invoiceNo = invoiceNo;
+    // Variable to store the order that will be updated
+    let orderToUpdate = null;
 
-    // Fetch the order using the getOrder logic
-    const orders = await FormDataSchema.find(query)
-      .sort({ OrderUpdatedAt: -1 }) // Sort by OrderUpdatedAt in descending order
-      .limit(1); // Fetch only the latest order
+    // Search each identifier field separately and update the first matched order
+    if (orderProformaNo) {
+      orderToUpdate = await FormDataSchema.findOne({ orderProformaNo });
+    }
 
-    if (!orders || orders.length === 0) {
+    if (!orderToUpdate && paypalInvoiceNo) {
+      orderToUpdate = await FormDataSchema.findOne({ paypalInvoiceNo });
+    }
+
+    if (!orderToUpdate && paypalTransactionId) {
+      orderToUpdate = await FormDataSchema.findOne({ paypalTransactionId });
+    }
+
+    if (!orderToUpdate && invoiceNo) {
+      orderToUpdate = await FormDataSchema.findOne({ invoiceNo });
+    }
+
+    // If no order is found, return a 404 error
+    if (!orderToUpdate) {
       return res.status(404).json({ error: "No matching order found" });
     }
 
-    const orderToUpdate = orders[0]; // Get the first (latest) order
-
-    // Update the order with the received fields
-    Object.keys(updateFields).forEach((field) => {
-      orderToUpdate[field] = updateFields[field]; // Update the order fields with new data
-    });
+    // Replace the entire order data with receivedData
+    orderToUpdate.set(receivedData);
 
     // Save the updated order
     await orderToUpdate.save();
