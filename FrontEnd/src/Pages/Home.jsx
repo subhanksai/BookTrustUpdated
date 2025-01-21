@@ -355,24 +355,24 @@ const OrderForm = () => {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const getISTTime = () => {
       const istOffset = 5.5 * 60 * 60000; // 5 hours 30 minutes in milliseconds
       return new Date(Date.now() + istOffset).toISOString();
     };
-  
+
     const safeNumber = (value, defaultValue = 0) => {
       const num = parseFloat(value);
       return isNaN(num) ? defaultValue : num;
     };
-  
+
     try {
       // Log and verify inputs
       console.log("Form Data:", formData);
-  
+
       // Use safeNumber for balanceAmount
       const numericBalanceAmount = safeNumber(formData.balanceAmount);
-  
+
       // Prepare remittance field based on modeOfPayment
       let remittanceField = {};
       if (formData.modeOfPayment === "PAYPAL") {
@@ -384,7 +384,7 @@ const OrderForm = () => {
           formData.bankRemittanceAmount
         ).toFixed(2);
       }
-  
+
       // Construct the new record
       const newRecord = {
         ...formData,
@@ -393,9 +393,9 @@ const OrderForm = () => {
         OrderCreatedAt: getISTTime(),
         OrderUpdatedAt: getISTTime(),
       };
-  
+
       console.log("New Record (Creating new order):", newRecord);
-  
+
       // Make the API call
       const postResponse = await axios.post(`${url}/api/create`, newRecord);
       console.log("Record created successfully:", postResponse.data);
@@ -406,7 +406,7 @@ const OrderForm = () => {
       alert("An error occurred. Please try again.");
     }
   };
-  
+
   // const handleSubmit = async (e) => {
   //   e.preventDefault();
 
@@ -718,15 +718,20 @@ const OrderForm = () => {
             {/* Buyer Customer ID */}
             <div className="col-md-2">
               <label htmlFor="buyercustomerId" className="form-label">
-                Buyer Customer ID
+                Buyer Customer ID *
               </label>
               <input
                 type="text"
-                className="form-control"
-                id="buyercustomerId"
+                className={`form-control ${
+                  errors.buyercustomerId ? "is-invalid" : ""
+                }`}
+                id="orderProformaNo"
                 value={formData.buyercustomerId}
                 onChange={handleChange}
               />
+              {errors.buyercustomerId && (
+                <div className="invalid-feedback">{errors.buyercustomerId}</div>
+              )}
             </div>
           </div>
 
@@ -877,20 +882,22 @@ const OrderForm = () => {
           <div>
             <div className="col-md-2">
               <label htmlFor="remittercustomerId" className="form-label">
-                Remitter Customer ID
+                Remitter Customer ID *
               </label>
               <input
                 type="text"
-                className="form-control"
-                id="remittercustomerId"
+                className={`form-control ${
+                  errors.remittercustomerId ? "is-invalid" : ""
+                }`}
+                id="orderProformaNo"
                 value={formData.remittercustomerId}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    remittercustomerId: e.target.value,
-                  })
-                }
+                onChange={handleChange}
               />
+              {errors.remittercustomerId && (
+                <div className="invalid-feedback">
+                  {errors.remittercustomerId}
+                </div>
+              )}
             </div>
             <div
               className={`btn btn-primary mt-3 ${

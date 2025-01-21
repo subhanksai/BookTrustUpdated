@@ -1,0 +1,27 @@
+{
+  "name": "booktrust",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run dev",
+    "server": "nodemon Server/index.js",
+    "frontend": "npm run dev --prefix FrontEnd",
+    "dev": "concurrently \"brew services start mongodb/brew/mongodb-community\" \"npm run server\"  \"npm run frontend\" ",
+    "install-all": "npm install --prefix FrontEnd && npm install --prefix Server && npm install nodemon && npm install concurrently",
+    "build": "vite build",
+    "start-db": "brew services start mongodb/brew/mongodb-community",
+    "stop-db": "brew services stop mongodb/brew/mongodb-community",
+    "restart-db": "brew services restart mongodb/brew/mongodb-community",
+    "deploy": "gh-pages -d dist"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "concurrently": "^9.1.0"
+  },
+  "devDependencies": {
+    "vite": "^6.0.5"
+  }
+}
