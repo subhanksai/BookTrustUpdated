@@ -469,8 +469,18 @@ const OrderForm = () => {
     >
       <h2 className="text-center mb-5">Order Form</h2>
       <form
-        className="row g-3 bg-light p-4 rounded shadow"
-        onSubmit={handleSubmit}
+        className="row g-3 bg-light p-4 rounded shadow needs-validation"
+        onSubmit={(e) => {
+          e.preventDefault();
+          const form = e.target;
+          if (form.checkValidity() === false) {
+            form.classList.add("was-validated");
+          } else {
+            // Call your custom submit logic here
+            handleSubmit();
+          }
+        }}
+        noValidate
       >
         {/* Row 1 */}
         <div className="col-md-1">
@@ -491,16 +501,13 @@ const OrderForm = () => {
           </label>
           <input
             type="text"
-            className={`form-control ${
-              errors.orderProformaNo ? "is-invalid" : ""
-            }`}
+            className="form-control"
             id="orderProformaNo"
             value={formData.orderProformaNo}
             onChange={handleChange}
+            required
           />
-          {errors.orderProformaNo && (
-            <div className="invalid-feedback">{errors.orderProformaNo}</div>
-          )}
+          <div className="invalid-feedback">Please fill out this field.</div>
         </div>
         {/* Mode of Remittance */}
         <div className="col-md-4">
@@ -722,16 +729,15 @@ const OrderForm = () => {
               </label>
               <input
                 type="text"
-                className={`form-control ${
-                  errors.buyercustomerId ? "is-invalid" : ""
-                }`}
-                id="orderProformaNo"
+                className="form-control"
+                id="buyercustomerId"
                 value={formData.buyercustomerId}
                 onChange={handleChange}
+                required
               />
-              {errors.buyercustomerId && (
-                <div className="invalid-feedback">{errors.buyercustomerId}</div>
-              )}
+              <div className="invalid-feedback">
+                Please fill out this field.
+              </div>
             </div>
           </div>
 
@@ -884,20 +890,18 @@ const OrderForm = () => {
               <label htmlFor="remittercustomerId" className="form-label">
                 Remitter Customer ID *
               </label>
+
               <input
                 type="text"
-                className={`form-control ${
-                  errors.remittercustomerId ? "is-invalid" : ""
-                }`}
-                id="orderProformaNo"
+                className="form-control"
+                id="remittercustomerId"
                 value={formData.remittercustomerId}
                 onChange={handleChange}
+                required
               />
-              {errors.remittercustomerId && (
-                <div className="invalid-feedback">
-                  {errors.remittercustomerId}
-                </div>
-              )}
+              <div className="invalid-feedback">
+                Please fill out this field.
+              </div>
             </div>
             <div
               className={`btn btn-primary mt-3 ${
