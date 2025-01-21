@@ -353,8 +353,70 @@ const OrderForm = () => {
       alert("An error occurred. Please try again.");
     }
   };
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+
+  //   const getISTTime = () => {
+  //     const istOffset = 5.5 * 60 * 60000; // 5 hours 30 minutes in milliseconds
+  //     return new Date(Date.now() + istOffset).toISOString();
+  //   };
+
+  //   const safeNumber = (value, defaultValue = 0) => {
+  //     const num = parseFloat(value);
+  //     return isNaN(num) ? defaultValue : num;
+  //   };
+
+  //   try {
+  //     // Log and verify inputs
+  //     console.log("Form Data:", formData);
+
+  //     // Use safeNumber for balanceAmount
+  //     const numericBalanceAmount = safeNumber(formData.balanceAmount);
+
+  //     // Prepare remittance field based on modeOfPayment
+  //     let remittanceField = {};
+  //     if (formData.modeOfPayment === "PAYPAL") {
+  //       remittanceField.outOfRemittanceForOrder = safeNumber(
+  //         formData.outOfRemittanceForOrder
+  //       ).toFixed(2);
+  //     } else {
+  //       remittanceField.bankRemittanceAmount = safeNumber(
+  //         formData.bankRemittanceAmount
+  //       ).toFixed(2);
+  //     }
+
+  //     // Construct the new record
+  //     const newRecord = {
+  //       ...formData,
+  //       balanceAmount: numericBalanceAmount.toFixed(2),
+  //       ...remittanceField, // Add the conditional remittance field
+  //       OrderCreatedAt: getISTTime(),
+  //       OrderUpdatedAt: getISTTime(),
+  //     };
+
+  //     console.log("New Record (Creating new order):", newRecord);
+
+  //     // Make the API call
+  //     const postResponse = await axios.post(`${url}/api/create`, newRecord);
+  //     console.log("Record created successfully:", postResponse.data);
+  //     alert("Record created successfully!");
+  //     window.location.reload();
+  //   } catch (error) {
+  //     console.error("Error during API call:", error.message);
+  //     alert("An error occurred. Please try again.");
+  //   }
+  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const form = e.target;
+
+    // Check if the form is valid
+    if (form.checkValidity() === false) {
+      // Add the 'was-validated' class to trigger Bootstrap's invalid styles
+      form.classList.add("was-validated");
+      return; // Exit early if the form is not valid
+    }
 
     const getISTTime = () => {
       const istOffset = 5.5 * 60 * 60000; // 5 hours 30 minutes in milliseconds
@@ -469,17 +531,8 @@ const OrderForm = () => {
     >
       <h2 className="text-center mb-5">Order Form</h2>
       <form
-        className="row g-3 bg-light p-4 rounded shadow needs-validation"
-        onSubmit={(e) => {
-          e.preventDefault();
-          const form = e.target;
-          if (form.checkValidity() === false) {
-            form.classList.add("was-validated");
-          } else {
-            // Call your custom submit logic here
-            handleSubmit();
-          }
-        }}
+        className="row g-3 bg-light p-4 rounded shadow"
+        onSubmit={handleSubmit}
         noValidate
       >
         {/* Row 1 */}
