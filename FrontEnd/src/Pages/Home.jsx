@@ -434,7 +434,7 @@ const OrderForm = () => {
       console.log("Form Data:", formData);
 
       // Use safeNumber for balanceAmount
-      const numericBalanceAmount = safeNumber(formData.balanceAmount);
+      const numericBalanceAmount = safeNumber(curBalance);
 
       // Prepare remittance field based on modeOfPayment
       let remittanceField = {};
