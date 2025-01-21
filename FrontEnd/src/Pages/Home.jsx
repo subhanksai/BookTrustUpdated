@@ -151,40 +151,6 @@ const OrderForm = () => {
   // console.log("CUR", curBalance);
   // console.log("Prev", prevBalance);
 
-  // Use the context values
-  // const handleCheckboxChange = (e) => {
-  //   const isChecked = e.target.checked;
-
-  //   setFormData((prevState) => {
-  //     if (isChecked) {
-  //       // If checked, copy all relevant fields from buyerDetails to remitterDetails
-  //       return {
-  //         ...prevState,
-  //         remitterDetails: {
-  //           ...prevState.buyerDetails, // Copy everything from buyerDetails to remitterDetails
-  //           remitterAddress: { ...prevState.buyerDetails.buyerAddress }, // Copy address as well
-  //         },
-  //         isSameAsBuyer: true,
-  //       };
-  //     } else {
-  //       // If unchecked, reset both personal and address fields for remitterDetails
-  //       return {
-  //         ...prevState,
-  //         remitterDetails: {
-  //           Name: "",
-  //           address1: "",
-  //           address2: "",
-  //           city: "",
-  //           state: "",
-  //           zip: "",
-  //           Phone: "",
-  //           Email: "",
-  //         },
-  //         isSameAsBuyer: false,
-  //       };
-  //     }
-  //   });
-  // };
   const handleCheckboxChange = (e) => {
     const isChecked = e.target.checked;
 
@@ -389,31 +355,36 @@ const OrderForm = () => {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const getISTTime = () => {
       const istOffset = 5.5 * 60 * 60000; // 5 hours 30 minutes in milliseconds
       return new Date(Date.now() + istOffset).toISOString();
     };
+  
     const safeNumber = (value, defaultValue = 0) => {
       const num = parseFloat(value);
       return isNaN(num) ? defaultValue : num;
     };
-
+  
     try {
+      // Log and verify inputs
+      console.log("Form Data:", formData);
+  
       // Use safeNumber for balanceAmount
-      const numericBalanceAmount = safeNumber(balanceAmount);
-
+      const numericBalanceAmount = safeNumber(formData.balanceAmount);
+  
       // Prepare remittance field based on modeOfPayment
       let remittanceField = {};
       if (formData.modeOfPayment === "PAYPAL") {
         remittanceField.outOfRemittanceForOrder = safeNumber(
-          outOfRemittanceForOrder
+          formData.outOfRemittanceForOrder
         ).toFixed(2);
       } else {
-        remittanceField.bankRemittanceAmount =
-          safeNumber(bankRemittanceAmount).toFixed(2);
+        remittanceField.bankRemittanceAmount = safeNumber(
+          formData.bankRemittanceAmount
+        ).toFixed(2);
       }
-
+  
       // Construct the new record
       const newRecord = {
         ...formData,
@@ -422,9 +393,9 @@ const OrderForm = () => {
         OrderCreatedAt: getISTTime(),
         OrderUpdatedAt: getISTTime(),
       };
-
+  
       console.log("New Record (Creating new order):", newRecord);
-
+  
       // Make the API call
       const postResponse = await axios.post(`${url}/api/create`, newRecord);
       console.log("Record created successfully:", postResponse.data);
@@ -435,6 +406,55 @@ const OrderForm = () => {
       alert("An error occurred. Please try again.");
     }
   };
+  
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+
+  //   const getISTTime = () => {
+  //     const istOffset = 5.5 * 60 * 60000; // 5 hours 30 minutes in milliseconds
+  //     return new Date(Date.now() + istOffset).toISOString();
+  //   };
+  //   const safeNumber = (value, defaultValue = 0) => {
+  //     const num = parseFloat(value);
+  //     return isNaN(num) ? defaultValue : num;
+  //   };
+
+  //   try {
+  //     // Use safeNumber for balanceAmount
+  //     const numericBalanceAmount = safeNumber(balanceAmount);
+
+  //     // Prepare remittance field based on modeOfPayment
+  //     let remittanceField = {};
+  //     if (formData.modeOfPayment === "PAYPAL") {
+  //       remittanceField.outOfRemittanceForOrder = safeNumber(
+  //         outOfRemittanceForOrder
+  //       ).toFixed(2);
+  //     } else {
+  //       remittanceField.bankRemittanceAmount =
+  //         safeNumber(bankRemittanceAmount).toFixed(2);
+  //     }
+
+  //     // Construct the new record
+  //     const newRecord = {
+  //       ...formData,
+  //       balanceAmount: numericBalanceAmount.toFixed(2),
+  //       ...remittanceField, // Add the conditional remittance field
+  //       OrderCreatedAt: getISTTime(),
+  //       OrderUpdatedAt: getISTTime(),
+  //     };
+
+  //     console.log("New Record (Creating new order):", newRecord);
+
+  //     // Make the API call
+  //     const postResponse = await axios.post(`${url}/api/create`, newRecord);
+  //     console.log("Record created successfully:", postResponse.data);
+  //     alert("Record created successfully!");
+  //     window.location.reload();
+  //   } catch (error) {
+  //     console.error("Error during API call:", error.message);
+  //     alert("An error occurred. Please try again.");
+  //   }
+  // };
 
   return (
     <div
@@ -467,7 +487,7 @@ const OrderForm = () => {
         </div>
         <div className="col-md-4">
           <label htmlFor="orderProformaNo" className="form-label">
-            Order Proforma No.
+            Order Proforma No. *
           </label>
           <input
             type="text"
