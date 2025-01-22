@@ -18,10 +18,7 @@ const UpdateForm = () => {
 
   const [transactionType, setTransactionType] = useState("no");
 
-  const [outOfRemittanceAmount, setoutOfRemittanceAmount] = useState();
-
   const [formData, setFormData] = useState({
-    slNo: "",
     orderProformaNo: "",
     paypalInvoiceNo: "",
     paypalInvoiceDate: "",
@@ -108,92 +105,6 @@ const UpdateForm = () => {
   //   return remaining.toFixed(2);
   // }
 
-  // // Utility function to calculate remaining balance for "Cancel" transaction
-  // function calculateRemainingBalanceForCancel(val1, val2, total) {
-  //   console.log("Inputs for Cancel:", val1, val2, total);
-
-  //   const numVal1 = parseFloat(val1) || 0;
-  //   const numVal2 = parseFloat(val2) || 0;
-  //   const numTotal = parseFloat(total) || 0;
-
-  //   const remaining = numTotal + numVal1 + numVal2;
-  //   console.log("Remaining Balance for Cancel:", remaining);
-
-  //   return remaining.toFixed(2);
-  // }
-
-  // // Handle changes in calculation-related fields
-  // const handleCalChange = (e) => {
-  //   const { name, value } = e.target;
-
-  //   // Ensure the value is a valid number
-  //   const updatedValue = parseFloat(value) || 0;
-
-  //   setFormData((prevData) => {
-  //     const updatedData = {
-  //       ...prevData,
-  //       [name]: updatedValue, // Dynamically update the changed field
-  //     };
-
-  //     // Calculate balance based on the "New" transaction logic
-  //     updatedData.balanceAmount = calculateRemainingBalanceForNew(
-  //       updatedData.edpms,
-  //       updatedData.totalOrderValue,
-  //       prevBalance
-  //     );
-
-  //     return updatedData;
-  //   });
-  // };
-
-  // // Handle changes in transaction type
-  // const handleTransactionTypeChange = (event) => {
-  //   const selectedType = event.target.value;
-  //   setTransactionType(selectedType); // Update transaction type state
-
-  //   setFormData((prevData) => {
-  //     const updatedData = { ...prevData };
-
-  //     if (selectedType === "new") {
-  //       // Reset fields for "New" transaction
-  //       updatedData.totalOrderValue = 0;
-  //       updatedData.edpms = 0;
-  //       updatedData.orderProformaNo = "";
-  //       updatedData.ReasonforCancellation = "";
-  //       updatedData.invoiceNo = "";
-  //       updatedData.invoiceDate = "";
-  //       updatedData.isCancelled = false;
-
-  //       // updatedData.balanceAmount = calculateRemainingBalanceForNew(
-  //       //   0,
-  //       //   0,
-  //       //   prevBalance
-  //       // );
-  //     } else if (selectedType === "cancel") {
-  //       // Calculate balance for "Cancel" transaction
-  //       updatedData.balanceAmount = calculateRemainingBalanceForCancel(
-  //         prevData.edpms,
-  //         prevData.totalOrderValue,
-  //         curBalance
-  //       );
-  //     }
-
-  //     return updatedData; // Return updated form data
-  //   });
-
-  //   // Update the previous balance for reference
-  //   setPrevBalance(curBalance || 0);
-  // };
-
-  function calculateRemainingBalanceForNew(val1, val2, total) {
-    console.log(val1, val2, total);
-
-    const remaining = total - (parseFloat(val1) || 0) - (parseFloat(val2) || 0);
-    console.log(remaining);
-
-    return remaining.toFixed(2);
-  }
-
   // Utility function to calculate remaining balance for "Cancel" transaction
   function calculateRemainingBalanceForCancel(val1, val2, total) {
     const numVal1 = parseFloat(val1) || 0;
@@ -204,26 +115,62 @@ const UpdateForm = () => {
   }
 
   // Handle changes in calculation-related fields
+  // const handleCalChange = (e) => {
+  //   const { name, value } = e.target;
+
+  //   // Parse the input value as a valid number
+
+  //   setFormData((prevData) => {
+  //     const updatedValue = parseFloat(value) || 0;
+  //     const updatedData = {
+  //       ...prevData,
+  //       [name]: updatedValue, // Update the changed field dynamically
+  //     };
+
+  //     // Calculate the balance based on transaction type
+  //     const calculateBalance = () => {
+  //       let updatedBalance = prevBalance;
+  //       if (transactionType === "new") {
+  //         return calculateRemainingBalanceForNew(
+  //           updatedData.edpms,
+  //           updatedData.totalOrderValue,
+  //           updatedBalance
+  //         );
+  //       } else if (transactionType === "update" && isUpdateBalance) {
+  //         return calculateRemainingBalanceForNew(
+  //           updatedData.edpms,
+  //           updatedData.totalOrderValue,
+  //           updateBalance
+  //         );
+  //       }
+  //       return updatedData.balanceAmount; // Default to existing balance if no change
+  //     };
+
+  //     const newBalance = calculateBalance();
+  //     updatedData.balanceAmount = parseFloat(newBalance); // Update the calculated balance
+  //     setCurBalance(parseFloat(newBalance)); // Reflect the balance for UI rendering
+
+  //     return updatedData; // Return the updated form data
+  //   });
+  // };
   const handleCalChange = (e) => {
     const { name, value } = e.target;
-    console.log("Here", updateBalance);
-
-    // Parse the input value as a valid number
-    const updatedValue = parseFloat(value) || 0;
 
     setFormData((prevData) => {
+      const updatedValue = parseFloat(value) || 0; // Parse and default to 0
       const updatedData = {
         ...prevData,
-        [name]: updatedValue, // Update the changed field dynamically
+        [name]: updatedValue, // Dynamically update the field
       };
 
       // Calculate the balance based on transaction type
       const calculateBalance = () => {
+        let updatedBalance = prevBalance;
         if (transactionType === "new") {
           return calculateRemainingBalanceForNew(
             updatedData.edpms,
             updatedData.totalOrderValue,
-            prevBalance
+            updatedBalance
           );
         } else if (transactionType === "update" && isUpdateBalance) {
           return calculateRemainingBalanceForNew(
@@ -232,16 +179,26 @@ const UpdateForm = () => {
             updateBalance
           );
         }
-        return updatedData.balanceAmount; // Default to existing balance if no change
+        return updatedData.balanceAmount; // Default to existing balance
       };
 
       const newBalance = calculateBalance();
-      updatedData.balanceAmount = newBalance; // Update the calculated balance
-      setCurBalance(newBalance); // Reflect the balance for UI rendering
+      updatedData.balanceAmount = parseFloat(newBalance); // Update balance
+      setCurBalance(parseFloat(newBalance)); // Reflect in UI
 
-      return updatedData; // Return the updated form data
+      return updatedData; // Return updated form data
     });
   };
+
+  function calculateRemainingBalanceForNew(val1, val2, total) {
+    const safeParse = (val) => parseFloat(val) || 0; // Ensure valid number
+    console.log(`Inputs: val1=${val1}, val2=${val2}, total=${total}`);
+
+    const remaining = safeParse(total) - safeParse(val1) - safeParse(val2);
+    console.log(`Remaining Balance: ${remaining.toFixed(2)}`);
+
+    return remaining.toFixed(2);
+  }
 
   // Handle transaction type changes
   const handleUpdateBalanceCheckboxChange = (e) => {
@@ -330,33 +287,6 @@ const UpdateForm = () => {
     setPrevBalance(curBalance || 0);
   };
 
-  // const handleUpdateBalanceCheckboxChange = (e) => {
-  //   const { checked } = e.target; // Get the checkbox checked status
-  //   setIsUpdateBalance(checked); // Update state with the new checkbox value
-
-  //   setFormData((prevData) => {
-  //     const updatedData = { ...prevData };
-
-  //     // If checkbox is checked, calculate the balance using the current fields
-  //     if (checked) {
-  //       const cancelBalance = calculateRemainingBalanceForCancel(
-  //         prevData.edpms,
-  //         prevData.totalOrderValue,
-  //         curBalance
-  //       );
-  //       updatedData.balanceAmount = cancelBalance;
-  //       setCurBalance(cancelBalance); // Update the balance
-
-  //     } else {
-  //       // Optionally, reset balance when unchecked (if needed)
-  //       updatedData.balanceAmount = prevData.balanceAmount;
-  //       setCurBalance(prevData.balanceAmount);
-  //     }
-  //     return updatedData;
-
-  //   });
-  // };
-
   const handleCheckboxChange = (e) => {
     const isChecked = e.target.checked;
 
@@ -369,6 +299,7 @@ const UpdateForm = () => {
             ...prevState.buyerDetails, // Copy everything from buyerDetails to remitterDetails
             remitterAddress: { ...prevState.buyerDetails.buyerAddress }, // Copy address as well
           },
+          remittercustomerId: prevState.buyercustomerId, // Set remittercustomerId same as buyercustomerId
           isSameAsBuyer: true,
         };
       } else {
@@ -377,21 +308,21 @@ const UpdateForm = () => {
           ...prevState,
           remitterDetails: {
             Name: "",
+            address1: "",
+            address2: "",
+            city: "",
+            state: "",
+            zip: "",
             Phone: "",
             Email: "",
-            remitterAddress: {
-              address1: "",
-              address2: "",
-              city: "",
-              state: "",
-              zip: "",
-            },
           },
+          remittercustomerId: "", // Reset remittercustomerId
           isSameAsBuyer: false,
         };
       }
     });
   };
+
   const handleChange = (e) => {
     const { id, value } = e.target;
     const idParts = id.split(".");
@@ -625,7 +556,7 @@ const UpdateForm = () => {
       const num = parseFloat(value);
       return isNaN(num) ? defaultValue : num;
     };
-    const numericBalanceAmount = safeNumber(formData.balanceAmount);
+    const numericBalanceAmount = safeNumber(curBalance);
     // Prepare the updated form data
     const updatedFormData = {
       ...formData,
@@ -954,20 +885,6 @@ const UpdateForm = () => {
             </div>
           </>
         )}
-
-        {/* Row 1 */}
-        <div className="col-md-1">
-          <label htmlFor="slNo" className="form-label">
-            SL.NO.
-          </label>
-          <input
-            type="text"
-            className="form-control"
-            id="slNo"
-            value={formData.slNo}
-            onChange={handleChange}
-          />
-        </div>
 
         <div className="col-md-4">
           <label htmlFor="orderProformaNo" className="form-label">

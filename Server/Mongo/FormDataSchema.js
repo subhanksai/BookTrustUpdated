@@ -2,9 +2,6 @@ const mongoose = require("mongoose");
 
 const orderSchema = new mongoose.Schema(
   {
-    slNo: {
-      type: Number,
-    },
     orderProformaNo: { type: String, required: true },
     modeOfPayment: {
       type: String,

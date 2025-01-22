@@ -110,7 +110,7 @@ const BalancePage = () => {
         setFormData(response.data.orders[0]); // Set the first order from the response
         setError(""); // Clear any previous errors
       } else {
-        setError("Order not found"); // If no orders are found, display the error
+        setError("Customer not found"); // If no orders are found, display the error
       }
     } catch (err) {
       console.error("Error fetching order data:", err);

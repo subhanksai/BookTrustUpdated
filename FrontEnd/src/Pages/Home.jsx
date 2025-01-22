@@ -12,7 +12,6 @@ const OrderForm = () => {
 
   // const { formData, setFormData } = useFormData();
   const [formData, setFormData] = useState({
-    slNo: "",
     orderProformaNo: "",
     paypalInvoiceNo: "",
     paypalInvoiceDate: "",
@@ -536,19 +535,6 @@ const OrderForm = () => {
         onSubmit={handleSubmit}
         noValidate
       >
-        {/* Row 1 */}
-        <div className="col-md-1">
-          <label htmlFor="slNo" className="form-label">
-            SL.NO.
-          </label>
-          <input
-            type="text"
-            className="form-control"
-            id="slNo"
-            value={formData.slNo}
-            onChange={handleChange}
-          />
-        </div>
         <div className="col-md-4">
           <label htmlFor="orderProformaNo" className="form-label">
             Order Proforma No. *
