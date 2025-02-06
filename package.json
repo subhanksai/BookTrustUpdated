@@ -7,19 +7,21 @@
     "start": "npm run dev",
     "server": "nodemon Server/index.js",
     "frontend": "npm run dev --prefix FrontEnd",
-    "dev": "concurrently \"brew services start mongodb/brew/mongodb-community\" \"npm run server\"  \"npm run frontend\" ",
-    "install-all": "npm install --prefix FrontEnd && npm install --prefix Server && npm install nodemon && npm install concurrently",
+    "dev": "concurrently \"npm run start-db\" \"npm run server\" \"npm run frontend\" ",
+    "install-all": "npm install --prefix FrontEnd && npm install --prefix Server && npm install nodemon && npm install concurrently && npm install mongodb --save && npm run install-db",
     "build": "vite build",
-    "start-db": "brew services start mongodb/brew/mongodb-community",
-    "stop-db": "brew services stop mongodb/brew/mongodb-community",
-    "restart-db": "brew services restart mongodb/brew/mongodb-community",
+    "start-db": "sudo systemctl start mongod",
+    "stop-db": "sudo systemctl stop mongod",
+    "restart-db": "sudo systemctl restart mongod",
+    "install-db": "sudo apt-get update && sudo apt-get install -y mongodb",
     "deploy": "gh-pages -d dist"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "concurrently": "^9.1.0"
+    "concurrently": "^9.1.0",
+    "mongodb": "^5.5.0"
   },
   "devDependencies": {
     "vite": "^6.0.5"
